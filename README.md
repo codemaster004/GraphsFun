@@ -1,3 +1,4 @@
+# Graphs and funny stuff
 class **Graph**
 - `set<Edge> t_edges`
 - `array<list<Vertex>> t_vertices`
@@ -8,9 +9,9 @@ can be obtained from `t_vertices` length of lists with neighbours
 ## Number of components
 ```python
 component_count = 0
-visits = SomeStruct()
+visits = VisitingStruct()
 for vertex in graph:
-    if not is_visited(visits, vertex):
+    if not visits.is_visited(vertex):
         component_count += 1
         dfs(graph, vertex, visits)
 ```

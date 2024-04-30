@@ -1,24 +1,6 @@
-#include "Utilities.h"
-
-
-void inputVertex() {
-
-}
-
-void inputGrapth() {
-	int nVertices = inputNumber('\n');
-	for (int i = 0; i < nVertices; ++i) {
-		inputVertex();
-	}
-}
 
 
 int main() {
-	int nGrapths = inputNumber('\n');
-	for (int i = 0; i < nGrapths; ++i) {
-		inputGrapth();
-	}
-
 	/*
 	 * 1. the degree sequence; Table with how many neighbours each Node has                 // out: 5 5 4 3 2 1
 	 * 2. the number of components; How many smaller sub-grapth exist.                      // out: 6
@@ -34,3 +16,4 @@ int main() {
 
 	return 0;
 }
+
