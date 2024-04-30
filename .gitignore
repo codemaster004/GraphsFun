@@ -1,0 +1,8 @@
+# IDE Files
+.idea/
+
+# CAMKE
+cmake-build-debug/
+
+# General library folder
+lib/
