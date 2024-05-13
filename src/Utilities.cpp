@@ -15,6 +15,9 @@ int inputNumber(char divider) {
 
 	char ch;
 	while ((ch = (char) getchar()) != divider) {
+		if (!divider && (ch == ' ' || ch == '\n')) {
+			break;
+		}
 		number = number * 10 + (ch - '0');
 	}
 

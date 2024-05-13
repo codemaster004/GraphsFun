@@ -1,22 +1,34 @@
+#include "Graph.h"
 #include "Utilities.h"
 
 
-void inputVertex() {
-
+void inputVertex(Graph& graph, int currentVertex) {
+	int nNeighbours = inputNumber(' ');
+	for (int i = 0; i < nNeighbours; ++i) {
+		int neighbour = inputNumber();
+		graph.addVertex(currentVertex, neighbour);
+	}
 }
 
-void inputGrapth() {
+void inputGrapth(Graph& graph) {
 	int nVertices = inputNumber('\n');
+	graph.setSize(nVertices);
+
 	for (int i = 0; i < nVertices; ++i) {
-		inputVertex();
+		inputVertex(graph, i+1);
 	}
 }
 
 
 int main() {
+	Graph graph;
 	int nGrapths = inputNumber('\n');
 	for (int i = 0; i < nGrapths; ++i) {
-		inputGrapth();
+		inputGrapth(graph);
+
+		graph.isPlanar();
+
+		graph.clear();
 	}
 
 	/*

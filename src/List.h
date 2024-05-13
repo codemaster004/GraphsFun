@@ -12,24 +12,24 @@ namespace dst {
 	public:
 		List() = default;
 
-		List(const List& other) : size(other.size) {
-			head = nullptr;
-			tail = nullptr;
-			if (other.head == nullptr)
+		List(const List& other) : t_size(other.t_size) {
+			t_head = nullptr;
+			t_tail = nullptr;
+			if (other.t_head == nullptr)
 				return;
 
-			head = new Node{other.head->value};
+			t_head = new Node{other.t_head->value};
 
-			Node* toCopy = other.head->after;
-			Node* current = head;
-			while (toCopy != other.tail) {
+			Node* toCopy = other.t_head->next;
+			Node* current = t_head;
+			while (toCopy != other.t_tail) {
 				Node* newNode = new Node{toCopy->value};
-				current->after = newNode;
+				current->next = newNode;
 				current = newNode;
-				toCopy = toCopy->after;
+				toCopy = toCopy->next;
 			}
-			current->after = nullptr;
-			tail = current;
+			current->next = nullptr;
+			t_tail = current;
 		}
 
 		List& operator=(const List& rhs) {
@@ -38,80 +38,80 @@ namespace dst {
 			}
 			clear();
 
-			size = rhs.size;
-			if (rhs.head == nullptr)
+			t_size = rhs.t_size;
+			if (rhs.t_head == nullptr)
 				return *this;
 
-			head = new Node{rhs.head->value};
+			t_head = new Node{rhs.t_head->value};
 
-			Node* toCopy = rhs.head->after;
-			Node* current = head;
-			while (toCopy != rhs.tail) {
+			Node* toCopy = rhs.t_head->next;
+			Node* current = t_head;
+			while (toCopy != rhs.t_tail) {
 				Node* newNode = new Node{toCopy->value};
-				current->after = newNode;
+				current->next = newNode;
 				current = newNode;
-				toCopy = toCopy->after;
+				toCopy = toCopy->next;
 			}
-			current->after = nullptr;
-			tail = current;
+			current->next = nullptr;
+			t_tail = current;
 
 			return *this;
 		}
 
 		void clear() {
-			Node* toDelete = head;
+			Node* toDelete = t_head;
 			while (toDelete != nullptr) {
-				head = toDelete->after;
+				t_head = toDelete->next;
 				delete toDelete;
-				toDelete = head;
+				toDelete = t_head;
 			}
-			size = 0;
-			head = nullptr;
-			tail = nullptr;
+			t_size = 0;
+			t_head = nullptr;
+			t_tail = nullptr;
 		}
 
 		void insertFront(const T& value) {
 			auto* newNode = new Node{value};
-			newNode->after = head;
-			head = newNode;
+			newNode->next = t_head;
+			t_head = newNode;
 
-			size++;
+			t_size++;
 
-			if (tail == nullptr) {
-				tail = newNode;
+			if (t_tail == nullptr) {
+				t_tail = newNode;
 			}
 		}
 
 		void insertBack(const T& value) {
 			auto* newNode = new Node{value};
 
-			size++;
-			if (tail == nullptr) {
-				head = newNode;
-				tail = newNode;
+			t_size++;
+			if (t_tail == nullptr) {
+				t_head = newNode;
+				t_tail = newNode;
 				return;
 			}
 
-			tail->after = newNode;
-			tail = newNode;
+			t_tail->next = newNode;
+			t_tail = newNode;
 		}
 
 		T& front() {
-			return head->value;
+			return t_head->value;
 		}
 
 		T& back() {
-			return tail->value;
+			return t_tail->value;
 		}
 
 		T removeFront() {
-			Node* toDelete = head;
-			head = toDelete->after;
-			if (head == nullptr) {
-				tail = nullptr;
+			Node* toDelete = t_head;
+			t_head = toDelete->next;
+			if (t_head == nullptr) {
+				t_tail = nullptr;
 			}
 
-			size--;
+			t_size--;
 
 			T retrievedValue = toDelete->value;
 			delete toDelete;
@@ -120,18 +120,29 @@ namespace dst {
 
 		[[nodiscard]]
 		bool isEmpty() const {
-			return size <= 0;
+			return t_size <= 0;
 		}
 
 		[[nodiscard]]
 		int getSize() const {
-			return size;
+			return t_size;
 		}
 
+		T& get(int index) {
+			Node* currect = t_head;
+			for (int i = 0; i < index; ++i) {
+				currect = currect->next;
+			}
+			return currect->value;
+		}
+
+		T& operator[](int index) {
+			return get(index);
+		}
 
 		// Stack Methods
 
-		void push(const T& value) {
+		void put(const T& value) {
 			insertFront(value);
 		}
 
@@ -145,7 +156,7 @@ namespace dst {
 
 		// Queue Methods
 
-		void put(const T& value) {
+		void push(const T& value) {
 			insertBack(value);
 		}
 
@@ -156,36 +167,36 @@ namespace dst {
 	private:
 		struct Node {
 			T value;
-			Node* after = nullptr;
+			Node* next = nullptr;
 		};
 
-		Node* head = nullptr;
-		Node* tail = nullptr;
+		Node* t_head = nullptr;
+		Node* t_tail = nullptr;
 
-		int size = 0;
+		int t_size = 0;
 
 		class Iterator {
-			Node* currentNode;
+			Node* t_currentNode;
 
 		public:
-			explicit Iterator(Node* node) : currentNode(node) {}
+			explicit Iterator(Node* node) : t_currentNode(node) {}
 
 			Iterator& operator++() {
-				currentNode = currentNode->after;
+				t_currentNode = t_currentNode->next;
 				return *this;
 			}
 
 			bool operator!=(const Iterator& other) const {
-				return currentNode != other.currentNode;
+				return t_currentNode != other.t_currentNode;
 			}
 
 			T& operator*() const {
-				return currentNode->value;
+				return t_currentNode->value;
 			}
 		};
 	public:
 		Iterator begin() {
-			return Iterator(head);
+			return Iterator(t_head);
 		}
 
 		Iterator end() {

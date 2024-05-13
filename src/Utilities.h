@@ -5,6 +5,13 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-int inputNumber(char divider = ' ');
+#include <cstdio>
+
+int inputNumber(char divider = 0);
+
+template<typename T>
+T min(T a, T b) {
+	return a < b ? a : b;
+}
 
 #endif //UTILITIES_H
