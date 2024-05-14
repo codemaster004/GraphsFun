@@ -34,7 +34,7 @@ void Graph::lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int
 	set(lowPoints1, current, dfsNumber);
 	set(lowPoints2, current, dfsNumber);
 
-	for (auto neighbour: getNeighbours(current)) {
+	for (Node neighbour: getNeighbours(current)) {
 		// if (firstIteration) {
 		// 	if (ancestor!=0) {
 		// 		set(branchPoints, neighbour, get(branchPoints, ancestor));
@@ -45,13 +45,13 @@ void Graph::lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int
 		// 	set(branchPoints, neighbour, current);
 		// }
 
-		if (get(dfsDiscovery, neighbour) != 0) {
-			updateLowpoints(current, neighbour, dfsDiscovery, lowPoints1, lowPoints2);
+		if (get(dfsDiscovery, neighbour.vertex) != 0) {
+			updateLowpoints(current, neighbour.vertex, dfsDiscovery, lowPoints1, lowPoints2);
 			continue;
 		}
 
-		lowPointDFS(neighbour, current, dfsNumber, dfsDiscovery, lowPoints1, lowPoints2, branchPoints);
-		updateLowpoints(current, neighbour, lowPoints1, lowPoints1, lowPoints2);
+		lowPointDFS(neighbour.vertex, current, dfsNumber, dfsDiscovery, lowPoints1, lowPoints2, branchPoints);
+		updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints1, lowPoints2);
 	}
 }
 

@@ -12,7 +12,12 @@ using vertex_t = int;
 
 
 class Graph {
-	dst::List<vertex_t>* t_adjancencyList;
+	struct Node {
+		vertex_t vertex;
+		int info;
+	};
+
+	dst::List<Node>* t_adjancencyList;
 	int t_numberVertices;
 
 	void lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int* dfsDiscovery, int* lowPoints1,
@@ -26,9 +31,9 @@ public:
 		t_adjancencyList = new dst::List<vertex_t>[t_numberVertices];
 	}
 
-	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack(u); }
+	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack({u, 0}); }
 
-	dst::List<vertex_t>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
+	dst::List<Node>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
 	bool isPlanar();
 
