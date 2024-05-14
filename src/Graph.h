@@ -15,10 +15,11 @@ class Graph {
 	dst::List<vertex_t>* t_adjancencyList;
 	int t_numberVertices;
 
-	void lowPointDFS(int current, int ancestor, bool* visited, int& dfsNumber, int* lowPoints1);
+	void lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int* dfsDiscovery, int* lowPoints1,
+					 int* lowPoints2, int* branchPoints);
 
 public:
-	Graph() : t_adjancencyList(nullptr) {}
+	Graph() : t_adjancencyList(nullptr), t_numberVertices(0) {}
 
 	void setSize(int n) {
 		t_numberVertices = n;
@@ -26,6 +27,8 @@ public:
 	}
 
 	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack(u); }
+
+	dst::List<vertex_t>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
 	bool isPlanar();
 

@@ -175,6 +175,7 @@ namespace dst {
 
 		int t_size = 0;
 
+	public:
 		class Iterator {
 			Node* t_currentNode;
 
@@ -194,7 +195,7 @@ namespace dst {
 				return t_currentNode->value;
 			}
 		};
-	public:
+
 		Iterator begin() {
 			return Iterator(t_head);
 		}
