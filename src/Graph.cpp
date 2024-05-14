@@ -99,5 +99,17 @@ bool Graph::isPlanar() {
 		printf("%d ", branchPoints[i]);
 	}
 	printf("\n");
+
+	print();
+
 	return false;
+}
+
+void Graph::print() {
+	for (int i = 0; i < t_numberVertices; ++i) {
+		for (Node vertexInfo: t_adjancencyList[i]) {
+			printf(" %d: %d, ", vertexInfo.vertex, vertexInfo.info);
+		}
+		printf("\n");
+	}
 }

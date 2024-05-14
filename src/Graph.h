@@ -35,7 +35,11 @@ public:
 
 	dst::List<Node>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
+	/* Tests */
+
 	bool isPlanar();
+
+	void print();
 
 	void clear() { delete[] t_adjancencyList; }
 
