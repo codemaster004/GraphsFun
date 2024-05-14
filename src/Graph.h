@@ -28,7 +28,7 @@ public:
 
 	void setSize(int n) {
 		t_numberVertices = n;
-		t_adjancencyList = new dst::List<vertex_t>[t_numberVertices];
+		t_adjancencyList = new dst::List<Node>[t_numberVertices];
 	}
 
 	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack({u, 0}); }
