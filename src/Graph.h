@@ -12,15 +12,16 @@ using vertex_t = int;
 
 
 class Graph {
-	struct Node {
+	struct Edge {
 		vertex_t vertex;
 		int info;
 	};
 
-	dst::List<Node>* t_adjancencyList;
+	dst::List<Edge>* t_adjancencyList;
 	int t_numberVertices;
 
 	int* t_degSequence;
+	dst::List<vertex_t> t_componnets;
 
 	// tables for planarity
 	int* t_discoveryTime;
@@ -28,6 +29,7 @@ class Graph {
 	int* t_lowPoints2;
 
 	void lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2);
+	bool bipartiteDfs(int* colours, vertex_t current, int previousColor);
 
 public:
 	Graph() :
@@ -40,13 +42,13 @@ public:
 		for (int i = 0; i < order + 1; ++i) {
 			t_degSequence[i] = 0;
 		}
-		t_adjancencyList = new dst::List<Node>[t_numberVertices];
+		t_adjancencyList = new dst::List<Edge>[t_numberVertices];
 	}
 
 	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack({u, 0}); }
 	void rememberDeg(int degree) { t_degSequence[degree] += 1; }
 
-	dst::List<Node>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
+	dst::List<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
 	/* Tests */
 
@@ -81,6 +83,7 @@ public:
 
 	void clear() {
 		t_numberVertices = 0;
+		t_componnets.clear();
 
 		delete[] t_degSequence;
 		t_degSequence = nullptr;

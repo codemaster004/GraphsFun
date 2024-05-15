@@ -61,7 +61,7 @@ void Graph::lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, in
 	set(lowPoints1, current, dfsCounter);
 	set(lowPoints2, current, dfsCounter);
 
-	for (Node& neighbour: getNeighbours(current)) {
+	for (Edge& neighbour: getNeighbours(current)) {
 
 		if (get(dfsDiscovery, neighbour.vertex) != 0) {
 			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
@@ -110,7 +110,6 @@ bool Graph::isPlanar() {
 
 int Graph::numberOfComponents() {
 	int dfsCount = 0;
-	int componentCount = 0;
 
 	t_discoveryTime = new int[t_numberVertices];
 	t_lowPoints1 = new int[t_numberVertices];
@@ -118,40 +117,57 @@ int Graph::numberOfComponents() {
 
 	for (int i = 0; i < t_numberVertices; ++i) {
 		if (!t_discoveryTime[i]) {
-			componentCount++;
+			t_componnets.push(i + 1);
 			lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 		}
 	}
-	return componentCount;
+	return t_componnets.getSize();
 }
 
-void bipartiteDfs(Graph& graph, int* colours) {
+bool Graph::bipartiteDfs(int* colours, vertex_t current, int previousColor) {
+	int newColor = previousColor % 2 + 1;
+	set(colours, current, newColor);
 
+	for (Edge neighbour: getNeighbours(current)) {
+		int neighbourColor = get(colours, neighbour.vertex);
+		if (neighbourColor == 0) {
+			if (!bipartiteDfs(colours, neighbour.vertex, newColor)) {
+				return false;
+			}
+		} else if (neighbourColor == newColor) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool Graph::isBipartite() {
-	auto* vertexColors = new int [t_numberVertices];
+	auto* vertexColoUrs = new int[t_numberVertices];
 	for (int i = 0; i < t_numberVertices; ++i) {
-		vertexColors[i] = 0;
+		vertexColoUrs[i] = 0;
 	}
 
-	delete[] vertexColors;
-	return false;
+	bool bipartite = true;
+	for (vertex_t componnet: t_componnets) {
+		bipartite = bipartiteDfs(vertexColoUrs, componnet, 2);
+		if (!bipartite) {
+			break;
+		}
+	}
+
+	delete[] vertexColoUrs;
+	return bipartite;
 }
 void Graph::vertexEccentricity() {}
 void Graph::vertexColorsGreedy() {}
 void Graph::vertexColorsLF() {}
 void Graph::vertexColorsSLF() {}
-int Graph::countOfC4() {
-	return 0;
-}
-int Graph::complementEdges() {
-	return 0;
-}
+int Graph::countOfC4() { return 0; }
+int Graph::complementEdges() { return 0; }
 
 void Graph::print() {
 	for (int i = 0; i < t_numberVertices; ++i) {
-		for (Node vertexInfo: t_adjancencyList[i]) {
+		for (Edge vertexInfo: t_adjancencyList[i]) {
 			printf(" %d: %d, ", vertexInfo.vertex, vertexInfo.info);
 		}
 		printf("\n");

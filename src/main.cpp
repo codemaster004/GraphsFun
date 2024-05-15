@@ -21,6 +21,14 @@ void inputGrapth(Graph& graph) {
 }
 
 
+void printBool(bool flag) {
+	if (flag) {
+		printf("T\n");
+	} else {
+		printf("F\n");
+	}
+}
+
 int main() {
 	Graph graph;
 	int nGrapths = inputNumber('\n');
@@ -31,8 +39,19 @@ int main() {
 		graph.removeDegreeSequence(); // no longer needed
 
 		printf("%d\n", graph.numberOfComponents());
+		printBool(graph.isBipartite());
+
+		printf("?\n"); // eccentricity
 
 		// graph.isPlanar();
+		printf("?\n");
+
+		printf("?\n"); // Greedy
+		printf("?\n"); // LF
+		printf("?\n"); // SLF
+
+		printf("0\n"); // count C4
+		printf("%d\n", graph.complementEdges()); // number of complement
 
 		graph.clear();
 	}
@@ -48,6 +67,7 @@ int main() {
 	 *		b. LF
 	 *		c. SLF
 	 *	7. the number of different C4 subgraphs; Number of missing edges to complete Graph. // out: 5
+	 *	8. the number of the graph complement's edges; all complete edges - edges count;    // out: 81
 	 */
 
 	return 0;
