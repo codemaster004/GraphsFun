@@ -14,13 +14,34 @@ void set(int* inTable, vertex_t forVertex, int toValue) { inTable[forVertex - 1]
 
 int get(const int* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
 
-void updateLowpoints(vertex_t currectVertex, vertex_t neighbourVertex, const int* neighbourValues, int* lowPoints1,
-					 int* lowPoints2) {
-	if (neighbourValues[neighbourVertex - 1] < lowPoints1[currectVertex - 1]) {
-		lowPoints2[currectVertex - 1] = lowPoints1[currectVertex - 1];
-		lowPoints1[currectVertex - 1] = neighbourValues[neighbourVertex - 1];
-	} else if (neighbourValues[neighbourVertex - 1] < lowPoints2[currectVertex - 1]) {
-		lowPoints2[currectVertex - 1] = neighbourValues[neighbourVertex - 1];
+void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2,
+					 const int* dfsValues, bool useLowPoints) {
+	int currentLow1 = lowPoints1[currect - 1];
+	int currentLow2 = lowPoints2[currect - 1];
+	if (useLowPoints && lowPoints1[neighbour - 1] != lowPoints2[neighbour - 1]) {
+		if (lowPoints1[neighbour - 1] < currentLow1) {
+			lowPoints2[currect - 1] = currentLow1;
+			lowPoints1[currect - 1] = lowPoints1[neighbour - 1];
+			// here current 1 since we assignted this value in prev line
+			if (lowPoints2[neighbour - 1] < currentLow1) {
+				lowPoints2[currect - 1] = lowPoints2[neighbour - 1];
+			}
+		} else if (lowPoints2[neighbour - 1] < currentLow2) {
+			lowPoints2[currect - 1] = lowPoints2[neighbour - 1];
+		}
+	} else {
+		int newValue;
+		if (useLowPoints) {
+			newValue = lowPoints1[neighbour - 1];
+		} else {
+			newValue = dfsValues[neighbour - 1];
+		}
+		if (newValue < currentLow1) {
+			lowPoints2[currect - 1] = currentLow1;
+			lowPoints1[currect - 1] = newValue;
+		} else if (newValue < currentLow2 && newValue != currentLow1) {
+			lowPoints2[currect - 1] = newValue;
+		}
 	}
 }
 
@@ -44,15 +65,15 @@ void Graph::lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int
 	for (Node& neighbour: getNeighbours(current)) {
 
 		if (get(dfsDiscovery, neighbour.vertex) != 0) {
-			updateLowpoints(current, neighbour.vertex, dfsDiscovery, lowPoints1, lowPoints2);
+			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
 		} else {
 			lowPointDFS(neighbour.vertex, current, dfsNumber, dfsDiscovery, lowPoints1, lowPoints2, branchPoints);
-			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints1, lowPoints2);
+			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, true);
 		}
 
 		// is a frond
 		if (get(dfsDiscovery, neighbour.vertex) < get(dfsDiscovery, current)) {
-			neighbour.info = get(dfsDiscovery, current);
+			neighbour.info = 2 * get(dfsDiscovery, neighbour.vertex);
 		} else if (get(lowPoints2, neighbour.vertex) == get(dfsDiscovery, current)) {
 			neighbour.info = 2 * get(lowPoints1, neighbour.vertex);
 		} else if (get(lowPoints2, neighbour.vertex) < get(dfsDiscovery, current)) {
