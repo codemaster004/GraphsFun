@@ -163,7 +163,13 @@ void Graph::vertexColorsGreedy() {}
 void Graph::vertexColorsLF() {}
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
-int Graph::complementEdges() { return 0; }
+int Graph::complementEdges() {
+	int numberOfEdgesForKGraph = t_numberVertices * (t_numberVertices - 1);
+	for (int i = 0; i < t_numberVertices; ++i) {
+		numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
+	}
+	return numberOfEdgesForKGraph / 2;
+}
 
 void Graph::print() {
 	for (int i = 0; i < t_numberVertices; ++i) {
