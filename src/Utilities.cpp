@@ -15,6 +15,9 @@ int inputNumber(char divider) {
 
 	char ch;
 	while ((ch = (char) getchar()) != divider) {
+		if (ch == '\r') {
+			continue;
+		}
 		if (!divider && (ch == ' ' || ch == '\n')) {
 			break;
 		}

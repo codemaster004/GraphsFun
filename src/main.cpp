@@ -4,6 +4,7 @@
 
 void inputVertex(Graph& graph, int currentVertex) {
 	int nNeighbours = inputNumber(' ');
+	graph.rememberDeg(nNeighbours);
 	for (int i = 0; i < nNeighbours; ++i) {
 		int neighbour = inputNumber();
 		graph.addVertex(currentVertex, neighbour);
@@ -12,10 +13,10 @@ void inputVertex(Graph& graph, int currentVertex) {
 
 void inputGrapth(Graph& graph) {
 	int nVertices = inputNumber('\n');
-	graph.setSize(nVertices);
+	graph.setGraphOrder(nVertices);
 
 	for (int i = 0; i < nVertices; ++i) {
-		inputVertex(graph, i+1);
+		inputVertex(graph, i + 1);
 	}
 }
 
@@ -26,7 +27,12 @@ int main() {
 	for (int i = 0; i < nGrapths; ++i) {
 		inputGrapth(graph);
 
-		graph.isPlanar();
+		graph.printDegSequence();
+		graph.removeDegreeSequence(); // no longer needed
+
+		printf("%d\n", graph.numberOfComponents());
+
+		// graph.isPlanar();
 
 		graph.clear();
 	}

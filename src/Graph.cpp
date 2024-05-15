@@ -14,8 +14,8 @@ void set(int* inTable, vertex_t forVertex, int toValue) { inTable[forVertex - 1]
 
 int get(const int* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
 
-void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2,
-					 const int* dfsValues, bool useLowPoints) {
+void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2, const int* dfsValues,
+					 bool useLowPoints) {
 	int currentLow1 = lowPoints1[currect - 1];
 	int currentLow2 = lowPoints2[currect - 1];
 	if (useLowPoints && lowPoints1[neighbour - 1] != lowPoints2[neighbour - 1]) {
@@ -55,19 +55,18 @@ void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int*
 // 	set(branchPoints, neighbour, current);
 // }
 
-void Graph::lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int* dfsDiscovery, int* lowPoints1,
-						int* lowPoints2, int* branchPoints) {
-	dfsNumber++;
-	set(dfsDiscovery, current, dfsNumber);
-	set(lowPoints1, current, dfsNumber);
-	set(lowPoints2, current, dfsNumber);
+void Graph::lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2) {
+	dfsCounter++;
+	set(dfsDiscovery, current, dfsCounter);
+	set(lowPoints1, current, dfsCounter);
+	set(lowPoints2, current, dfsCounter);
 
 	for (Node& neighbour: getNeighbours(current)) {
 
 		if (get(dfsDiscovery, neighbour.vertex) != 0) {
 			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
 		} else {
-			lowPointDFS(neighbour.vertex, current, dfsNumber, dfsDiscovery, lowPoints1, lowPoints2, branchPoints);
+			lowPointDfs(neighbour.vertex, dfsCounter, dfsDiscovery, lowPoints1, lowPoints2);
 			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, true);
 		}
 
@@ -85,45 +84,69 @@ void Graph::lowPointDFS(vertex_t current, vertex_t ancestor, int& dfsNumber, int
 }
 
 bool Graph::isPlanar() {
-	int dfsCount = 0;
-	auto* discoveryTime = new int[t_numberVertices];
-	auto* lowPoints1 = new int[t_numberVertices];
-	auto* lowPoints2 = new int[t_numberVertices];
-	auto* branchPoints = new int[t_numberVertices];
-
-	for (int i = 0; i < t_numberVertices; ++i) {
-		if (!discoveryTime[i]) {
-			lowPointDFS(i + 1, 0, dfsCount, discoveryTime, lowPoints1, lowPoints2, branchPoints);
-		}
-	}
 
 	printf("D:  ");
 	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", discoveryTime[i]);
+		printf("%d ", t_discoveryTime[i]);
 	}
 	printf("\n");
 
 	printf("L1: ");
 	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", lowPoints1[i]);
+		printf("%d ", t_lowPoints1[i]);
 	}
 	printf("\n");
 
 	printf("L2: ");
 	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", lowPoints2[i]);
-	}
-	printf("\n");
-
-	printf("B:  ");
-	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", branchPoints[i]);
+		printf("%d ", t_lowPoints2[i]);
 	}
 	printf("\n");
 
 	print();
 
 	return false;
+}
+
+int Graph::numberOfComponents() {
+	int dfsCount = 0;
+	int componentCount = 0;
+
+	t_discoveryTime = new int[t_numberVertices];
+	t_lowPoints1 = new int[t_numberVertices];
+	t_lowPoints2 = new int[t_numberVertices];
+
+	for (int i = 0; i < t_numberVertices; ++i) {
+		if (!t_discoveryTime[i]) {
+			componentCount++;
+			lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
+		}
+	}
+	return componentCount;
+}
+
+void bipartiteDfs(Graph& graph, int* colours) {
+
+}
+
+bool Graph::isBipartite() {
+	auto* vertexColors = new int [t_numberVertices];
+	for (int i = 0; i < t_numberVertices; ++i) {
+		vertexColors[i] = 0;
+	}
+
+	delete[] vertexColors;
+	return false;
+}
+void Graph::vertexEccentricity() {}
+void Graph::vertexColorsGreedy() {}
+void Graph::vertexColorsLF() {}
+void Graph::vertexColorsSLF() {}
+int Graph::countOfC4() {
+	return 0;
+}
+int Graph::complementEdges() {
+	return 0;
 }
 
 void Graph::print() {
@@ -133,4 +156,13 @@ void Graph::print() {
 		}
 		printf("\n");
 	}
+}
+
+void Graph::printDegSequence() const {
+	for (int i = t_numberVertices; i >= 0; --i) {
+		for (int j = 0; j < t_degSequence[i]; ++j) {
+			printf("%d ", i);
+		}
+	}
+	printf("\n");
 }
