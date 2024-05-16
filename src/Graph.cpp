@@ -120,6 +120,9 @@ int Graph::numberOfComponents() {
 	// t_lowPoints2 = new int[t_numberVertices];
 
 	auto* visited = new bool[t_numberVertices];
+	for (int i = 0; i < t_numberVertices; ++i) {
+		visited[i] = false;
+	}
 
 	for (int i = 0; i < t_numberVertices; ++i) {
 		if (!visited[i]) {
@@ -234,7 +237,13 @@ int Graph::countOfC4() { return 0; }
 int Graph::complementEdges() {
 	int numberOfEdgesForKGraph = t_numberVertices * (t_numberVertices - 1);
 	for (int i = 0; i < t_numberVertices; ++i) {
-		numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
+		// todo: faster? please?
+		for (Edge neighbour: getNeighbours(i+1)) {
+			if (neighbour.vertex != i+1) {
+				numberOfEdgesForKGraph--;
+			}
+		}
+		// numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
 	}
 	return numberOfEdgesForKGraph / 2;
 }

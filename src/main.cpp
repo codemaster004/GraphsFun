@@ -38,6 +38,7 @@ void printBool(bool flag) {
 }
 
 int main() {
+
 	Graph graph;
 	int nGrapths = inputNumber('\n');
 	for (int i = 0; i < nGrapths; ++i) {
@@ -46,11 +47,11 @@ int main() {
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		// printf("?\n");
-		printf("%d\n", graph.numberOfComponents());
-
+		// printf("%d\n", graph.numberOfComponents());
 		printf("?\n");
+
 		// printBool(graph.isBipartite());
+		printf("?\n");
 
 		printf("?\n"); // eccentricity
 
@@ -64,8 +65,9 @@ int main() {
 		printf("?\n"); // SLF
 
 		printf("?\n"); // count C4
-		printf("?\n"); // number of complement
+
 		// printf("%d\n", graph.complementEdges()); // number of complement
+		printf("?\n"); // number of complement
 
 		graph.clear();
 	}

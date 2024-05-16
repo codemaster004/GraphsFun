@@ -96,7 +96,6 @@ public:
 	}
 
 	void clear() {
-		t_numberVertices = 0;
 		t_componnets.clear();
 
 		delete[] t_degSequence;
@@ -105,18 +104,25 @@ public:
 		delete[] t_colours;
 		t_colours = nullptr;
 
+		for (int i = 0; i < t_numberVertices; ++i) {
+			t_adjancencyList[i].clear();
+		}
 		delete[] t_adjancencyList;
 		t_adjancencyList = nullptr;
+
+		t_numberVertices = 0;
 	}
 
-	~Graph() = default;
+	~Graph() {
+		clear();
+	};
 };
 
 template<typename T>
 void set(T* inTable, vertex_t forVertex, T toValue) { inTable[forVertex - 1] = toValue; }
 
 template<typename T>
-int get(const T* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
+T get(const T* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
 
 
 #endif // GRAPH_H
