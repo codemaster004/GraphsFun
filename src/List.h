@@ -8,8 +8,12 @@
 namespace dst {
 	template<typename T>
 	class List {
-
 	public:
+		struct Node {
+			T value;
+			Node* next = nullptr;
+		};
+
 		List() = default;
 
 		List(const List& other) : t_size(other.t_size) {
@@ -140,6 +144,10 @@ namespace dst {
 			return get(index);
 		}
 
+		Node* getHead() {
+			return t_head;
+		}
+
 		// Stack Methods
 
 		void put(const T& value) {
@@ -165,10 +173,6 @@ namespace dst {
 		}
 
 	private:
-		struct Node {
-			T value;
-			Node* next = nullptr;
-		};
 
 		Node* t_head = nullptr;
 		Node* t_tail = nullptr;
