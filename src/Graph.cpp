@@ -9,11 +9,6 @@
 #include "Graph.h"
 #include "Utilities.h"
 
-
-void set(int* inTable, vertex_t forVertex, int toValue) { inTable[forVertex - 1] = toValue; }
-
-int get(const int* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
-
 void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2, const int* dfsValues,
 					 bool useLowPoints) {
 	int currentLow1 = lowPoints1[currect - 1];
@@ -124,14 +119,14 @@ int Graph::numberOfComponents() {
 	return t_componnets.getSize();
 }
 
-bool Graph::bipartiteDfs(int* colours, vertex_t current, int previousColor) {
+bool Graph::bipartiteDfs(vertex_t current, int previousColor) {
 	int newColor = previousColor % 2 + 1;
-	set(colours, current, newColor);
+	set(t_colours, current, newColor);
 
 	for (Edge neighbour: getNeighbours(current)) {
-		int neighbourColor = get(colours, neighbour.vertex);
+		int neighbourColor = get(t_colours, neighbour.vertex);
 		if (neighbourColor == 0) {
-			if (!bipartiteDfs(colours, neighbour.vertex, newColor)) {
+			if (!bipartiteDfs(neighbour.vertex, newColor)) {
 				return false;
 			}
 		} else if (neighbourColor == newColor) {
@@ -142,25 +137,84 @@ bool Graph::bipartiteDfs(int* colours, vertex_t current, int previousColor) {
 }
 
 bool Graph::isBipartite() {
-	auto* vertexColoUrs = new int[t_numberVertices];
-	for (int i = 0; i < t_numberVertices; ++i) {
-		vertexColoUrs[i] = 0;
-	}
+	resetColours();
 
 	bool bipartite = true;
 	for (vertex_t componnet: t_componnets) {
-		bipartite = bipartiteDfs(vertexColoUrs, componnet, 2);
+		bipartite = bipartiteDfs(componnet, 2);
 		if (!bipartite) {
 			break;
 		}
 	}
 
-	delete[] vertexColoUrs;
 	return bipartite;
 }
 void Graph::vertexEccentricity() {}
-void Graph::vertexColorsGreedy() {}
-void Graph::vertexColorsLF() {}
+void Graph::vertexColorsGreedy() {
+	resetColours();
+
+	auto* colorUsed = new bool[t_numberVertices];
+	for (int i = 0; i < t_numberVertices; ++i) {
+		vertex_t current = i + 1;
+		if (get(t_colours, current) == 0) {
+			int maxColorUsed = 0;
+
+			for (Edge neighbour: getNeighbours(current)) {
+				int neighbourColor = get(t_colours, neighbour.vertex);
+
+				if (neighbourColor != 0) {
+					colorUsed[neighbourColor - 1] = false;
+
+					if (neighbourColor > maxColorUsed) {
+						maxColorUsed = neighbourColor;
+					}
+				}
+			}
+
+			int minColorPicked = 0;
+			for (int j = 0; j < maxColorUsed; ++j) {
+				if (colorUsed[j] && minColorPicked == 0) {
+					minColorPicked = j + 1;
+				}
+				colorUsed[j] = true;
+			}
+			if (minColorPicked == 0) {
+				minColorPicked = maxColorUsed + 1;
+			}
+			set(t_colours, current, minColorPicked);
+		}
+	}
+
+	delete[] colorUsed;
+}
+void Graph::vertexColorsLF() {
+	dst::Queue<vertex_t> vertiveQueque;
+	auto* degreeSequence = new int[t_numberVertices];
+
+	int smallestDegree = t_numberVertices;
+	vertex_t leastConnected = 0;
+	for (int i = 0; i < t_numberVertices; ++i) {
+		int degree = t_adjancencyList[i].getSize();
+		degreeSequence[i] = degree;
+		if (degree < smallestDegree) {
+			smallestDegree = degree;
+			leastConnected = i + 1;
+		}
+	}
+
+	for (int i = 0; i < t_numberVertices; ++i) {
+		
+	}
+	for (int i = 0; i < t_numberVertices; ++i) {
+		vertiveQueque.put(leastConnected);
+		set(degreeSequence, leastConnected, 0);
+		for (Edge neighbour: getNeighbours(leastConnected)) {
+			degreeSequence[neighbour.vertex - 1] -= 1;
+		}
+	}
+
+	delete[] degreeSequence;
+}
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
 int Graph::complementEdges() {
@@ -185,6 +239,13 @@ void Graph::printDegSequence() const {
 		for (int j = 0; j < t_degSequence[i]; ++j) {
 			printf("%d ", i);
 		}
+	}
+	printf("\n");
+}
+
+void Graph::printColours() const {
+	for (int i = 0; i < t_numberVertices; ++i) {
+		printf("%d ", t_colours[i]);
 	}
 	printf("\n");
 }

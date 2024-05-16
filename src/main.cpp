@@ -4,10 +4,18 @@
 
 void inputVertex(Graph& graph, int currentVertex) {
 	int nNeighbours = inputNumber(' ');
+	if (nNeighbours == 0) {
+		getchar(); // um magic in the input
+	}
+
 	graph.rememberDeg(nNeighbours);
-	for (int i = 0; i < nNeighbours; ++i) {
-		int neighbour = inputNumber();
+
+	for (int i = 0; i < nNeighbours - 1; ++i) {
+		int neighbour = inputNumber(' ');
 		graph.addVertex(currentVertex, neighbour);
+	}
+	if (nNeighbours >= 1) {
+		graph.addVertex(currentVertex, inputNumber('\n'));
 	}
 }
 
@@ -38,8 +46,10 @@ int main() {
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		printf("%d\n", graph.numberOfComponents());
-		printBool(graph.isBipartite());
+		printf("?\n");
+		// printf("%d\n", graph.numberOfComponents());
+		printf("?\n");
+		// printBool(graph.isBipartite());
 
 		printf("?\n"); // eccentricity
 
@@ -47,11 +57,14 @@ int main() {
 		printf("?\n");
 
 		printf("?\n"); // Greedy
+		// graph.vertexColorsGreedy();
+		// graph.printColours();
 		printf("?\n"); // LF
 		printf("?\n"); // SLF
 
-		printf("0\n"); // count C4
-		printf("%d\n", graph.complementEdges()); // number of complement
+		printf("?\n"); // count C4
+		printf("?\n"); // number of complement
+		// printf("%d\n", graph.complementEdges()); // number of complement
 
 		graph.clear();
 	}

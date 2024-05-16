@@ -13,15 +13,14 @@
 int inputNumber(char divider) {
 	int number = 0;
 
-	char ch;
-	while ((ch = (char) getchar()) != divider) {
-		if (ch == '\r') {
-			continue;
-		}
-		if (!divider && (ch == ' ' || ch == '\n')) {
+	int ch;
+	while ((ch = getchar()) != divider) {
+		if (ch == EOF || (divider == 0 && (ch == ' ' || ch == '\n'))) {
 			break;
 		}
-		number = number * 10 + (ch - '0');
+		if (ch >= '0' && ch <= '9') {
+			number = number * 10 + (ch - '0');
+		}
 	}
 
 	return number;

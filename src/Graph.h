@@ -23,17 +23,19 @@ class Graph {
 	int* t_degSequence;
 	dst::List<vertex_t> t_componnets;
 
+	int* t_colours;
+
 	// tables for planarity
 	int* t_discoveryTime;
 	int* t_lowPoints1;
 	int* t_lowPoints2;
 
 	void lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2);
-	bool bipartiteDfs(int* colours, vertex_t current, int previousColor);
+	bool bipartiteDfs(vertex_t current, int previousColor);
 
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degSequence(nullptr), t_discoveryTime(nullptr),
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degSequence(nullptr), t_colours(nullptr), t_discoveryTime(nullptr),
 		t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
 
 	void setGraphOrder(int order) {
@@ -42,6 +44,9 @@ public:
 		for (int i = 0; i < order + 1; ++i) {
 			t_degSequence[i] = 0;
 		}
+
+		t_colours = new int[t_numberVertices];
+
 		t_adjancencyList = new dst::List<Edge>[t_numberVertices];
 	}
 
@@ -76,9 +81,17 @@ public:
 
 	void printDegSequence() const;
 
+	void printColours() const;
+
 	void removeDegreeSequence() {
 		delete[] t_degSequence;
 		t_degSequence = nullptr;
+	}
+
+	void resetColours() {
+		for (int i = 0; i < t_numberVertices; ++i) {
+			t_colours[i] = 0;
+		}
 	}
 
 	void clear() {
@@ -88,12 +101,21 @@ public:
 		delete[] t_degSequence;
 		t_degSequence = nullptr;
 
+		delete[] t_colours;
+		t_colours = nullptr;
+
 		delete[] t_adjancencyList;
 		t_adjancencyList = nullptr;
 	}
 
 	~Graph() = default;
 };
+
+template<typename T>
+void set(T* inTable, vertex_t forVertex, T toValue) { inTable[forVertex - 1] = toValue; }
+
+template<typename T>
+int get(const T* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
 
 
 #endif // GRAPH_H
