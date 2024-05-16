@@ -39,35 +39,46 @@ void printBool(bool flag) {
 
 int main() {
 
+	static int COUNT = 0;
+	int N_CASE = 1;
+
 	Graph graph;
 	int nGrapths = inputNumber('\n');
 	for (int i = 0; i < nGrapths; ++i) {
+		COUNT++;
 		inputGrapth(graph);
 
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		// printf("%d\n", graph.numberOfComponents());
-		printf("?\n");
+		printf("%d\n", graph.numberOfComponents());
+		// printf("?\n");
 
-		// printBool(graph.isBipartite());
-		printf("?\n");
+		printBool(graph.isBipartite());
+		// printf("?\n");
 
 		printf("?\n"); // eccentricity
 
 		// graph.isPlanar();
 		printf("?\n");
 
-		printf("?\n"); // Greedy
-		// graph.vertexColorsGreedy();
-		// graph.printColours();
+		// printf("?\n"); // Greedy
+		graph.vertexColorsGreedy();
+		graph.printColours();
+
 		printf("?\n"); // LF
 		printf("?\n"); // SLF
 
 		printf("?\n"); // count C4
 
-		// printf("%d\n", graph.complementEdges()); // number of complement
-		printf("?\n"); // number of complement
+		// printf("%d\n", graph.complementEdges());
+		printf("?\n");
+		// if (COUNT == N_CASE) {
+			// printf("1\n");
+			// printf("%d\n", graph.complementEdges()); // number of complement
+		// } else {
+			// printf("?\n"); // number of complement
+		// }
 
 		graph.clear();
 	}

@@ -236,15 +236,21 @@ void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
 int Graph::complementEdges() {
 	int numberOfEdgesForKGraph = t_numberVertices * (t_numberVertices - 1);
+	// auto* used = new int [t_numberVertices];
 	for (int i = 0; i < t_numberVertices; ++i) {
-		// todo: faster? please?
-		for (Edge neighbour: getNeighbours(i+1)) {
-			if (neighbour.vertex != i+1) {
-				numberOfEdgesForKGraph--;
-			}
-		}
-		// numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
+		// for (int j = 0; j < t_numberVertices; ++j) {
+		// 	used[j] = false;
+		// }
+		// // todo: faster? please?
+		// for (Edge neighbour: getNeighbours(i+1)) {
+		// 	if (neighbour.vertex != i+1 && !used[neighbour.vertex-1]) {
+		// 		used[neighbour.vertex-1] = true;
+		// 		numberOfEdgesForKGraph--;
+		// 	}
+		// }
+		numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
 	}
+	// delete[] used;
 	return numberOfEdgesForKGraph / 2;
 }
 
