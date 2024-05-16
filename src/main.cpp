@@ -46,8 +46,9 @@ int main() {
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		printf("?\n");
-		// printf("%d\n", graph.numberOfComponents());
+		// printf("?\n");
+		printf("%d\n", graph.numberOfComponents());
+
 		printf("?\n");
 		// printBool(graph.isBipartite());
 

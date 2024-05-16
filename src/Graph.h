@@ -32,6 +32,7 @@ class Graph {
 
 	void lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2);
 	bool bipartiteDfs(vertex_t current, int previousColor);
+	void dfs(vertex_t current, bool* visited);
 
 public:
 	Graph() :

@@ -103,19 +103,33 @@ bool Graph::isPlanar() {
 	return false;
 }
 
+void Graph::dfs(vertex_t current, bool* visited) {
+	set(visited, current, true);
+	for (Edge neighbour: getNeighbours(current)) {
+		if (!get(visited, neighbour.vertex)) {
+			dfs(neighbour.vertex, visited);
+		}
+	}
+}
+
 int Graph::numberOfComponents() {
 	int dfsCount = 0;
 
-	t_discoveryTime = new int[t_numberVertices];
-	t_lowPoints1 = new int[t_numberVertices];
-	t_lowPoints2 = new int[t_numberVertices];
+	// t_discoveryTime = new int[t_numberVertices];
+	// t_lowPoints1 = new int[t_numberVertices];
+	// t_lowPoints2 = new int[t_numberVertices];
+
+	auto* visited = new bool[t_numberVertices];
 
 	for (int i = 0; i < t_numberVertices; ++i) {
-		if (!t_discoveryTime[i]) {
+		if (!visited[i]) {
 			t_componnets.push(i + 1);
-			lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
+			dfs(i+1, visited);
+			// lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 		}
 	}
+
+	delete[] visited;
 	return t_componnets.getSize();
 }
 
