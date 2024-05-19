@@ -10,4 +10,5 @@ add_executable(GraphsFun src/main.cpp
         src/Graph.h
         src/List.h
         src/Set.h
-        src/SparseMatrix.h)
+        src/SparseMatrix.h
+        src/Vector.h)

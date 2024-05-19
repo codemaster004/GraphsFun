@@ -7,6 +7,7 @@
 #define DEBUG
 
 #include "List.h"
+#include "Vector.h"
 
 using vertex_t = int;
 
@@ -17,7 +18,7 @@ class Graph {
 		int info;
 	};
 
-	dst::List<Edge>* t_adjancencyList;
+	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
 
 	int* t_degSequence;
@@ -48,13 +49,14 @@ public:
 
 		t_colours = new int[t_numberVertices];
 
-		t_adjancencyList = new dst::List<Edge>[t_numberVertices];
+		t_adjancencyList = new dst::Vector<Edge>[t_numberVertices];
 	}
 
-	void addVertex(int v, int u) { t_adjancencyList[v - 1].insertBack({u, 0}); }
+	void setVertexDegree(vertex_t v, int degree) { t_adjancencyList[v - 1].resize(degree);}
+	void addVertex(int v, int u) { t_adjancencyList[v - 1].pushBack({u, 0}); }
 	void rememberDeg(int degree) { t_degSequence[degree] += 1; }
 
-	dst::List<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
+	dst::Vector<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
 	/* Tests */
 

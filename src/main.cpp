@@ -2,13 +2,14 @@
 #include "Utilities.h"
 
 
-void inputVertex(Graph& graph, int currentVertex) {
+void inputVertex(Graph& graph, vertex_t currentVertex) {
 	int nNeighbours = inputNumber(' ');
 	if (nNeighbours == 0) {
 		getchar(); // um magic in the input
 	}
 
 	graph.rememberDeg(nNeighbours);
+	graph.setVertexDegree(currentVertex, nNeighbours);
 
 	for (int i = 0; i < nNeighbours - 1; ++i) {
 		int neighbour = inputNumber(' ');
