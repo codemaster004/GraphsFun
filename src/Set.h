@@ -5,4 +5,14 @@
 #ifndef SET_H
 #define SET_H
 
+namespace dst {
+	class Set {
+
+	public:
+		Set() {
+
+		}
+	};
+}
+
 #endif //SET_H

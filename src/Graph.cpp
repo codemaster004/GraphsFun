@@ -207,6 +207,7 @@ void Graph::vertexColorsGreedy() {
 void Graph::vertexColorsLF() {
 	dst::Queue<vertex_t> vertiveQueque;
 	auto* degreeSequence = new int[t_numberVertices];
+	dst::List<Edge> vertexDegrees;
 
 	int smallestDegree = t_numberVertices;
 	vertex_t leastConnected = 0;

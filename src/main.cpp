@@ -67,18 +67,15 @@ int main() {
 		graph.printColours();
 
 		printf("?\n"); // LF
+		graph.vertexColorsLF();
+		// graph.printColours();
+
 		printf("?\n"); // SLF
 
 		printf("?\n"); // count C4
 
 		// printf("%d\n", graph.complementEdges());
 		printf("?\n");
-		// if (COUNT == N_CASE) {
-			// printf("1\n");
-			// printf("%d\n", graph.complementEdges()); // number of complement
-		// } else {
-			// printf("?\n"); // number of complement
-		// }
 
 		graph.clear();
 	}
