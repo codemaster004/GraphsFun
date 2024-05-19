@@ -127,7 +127,7 @@ int Graph::numberOfComponents() {
 	for (int i = 0; i < t_numberVertices; ++i) {
 		if (!visited[i]) {
 			t_componnets.push(i + 1);
-			dfs(i+1, visited);
+			dfs(i + 1, visited);
 			// lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 		}
 	}
@@ -221,7 +221,6 @@ void Graph::vertexColorsLF() {
 	}
 
 	for (int i = 0; i < t_numberVertices; ++i) {
-		
 	}
 	for (int i = 0; i < t_numberVertices; ++i) {
 		vertiveQueque.put(leastConnected);
@@ -235,27 +234,13 @@ void Graph::vertexColorsLF() {
 }
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
-int Graph::complementEdges() {
+int Graph::complementEdges() const {
 	int numberOfEdgesForKGraph = t_numberVertices * (t_numberVertices - 1);
-	// auto* used = new int [t_numberVertices];
-	for (int i = 0; i < t_numberVertices; ++i) {
-		// for (int j = 0; j < t_numberVertices; ++j) {
-		// 	used[j] = false;
-		// }
-		// // todo: faster? please?
-		// for (Edge neighbour: getNeighbours(i+1)) {
-		// 	if (neighbour.vertex != i+1 && !used[neighbour.vertex-1]) {
-		// 		used[neighbour.vertex-1] = true;
-		// 		numberOfEdgesForKGraph--;
-		// 	}
-		// }
-		numberOfEdgesForKGraph -= t_adjancencyList[i].getSize();
-	}
-	// delete[] used;
+	numberOfEdgesForKGraph -= t_degreeSum;
 	return numberOfEdgesForKGraph / 2;
 }
 
-void Graph::print() {
+void Graph::print() const {
 	for (int i = 0; i < t_numberVertices; ++i) {
 		for (Edge vertexInfo: t_adjancencyList[i]) {
 			printf(" %d: %d, ", vertexInfo.vertex, vertexInfo.info);

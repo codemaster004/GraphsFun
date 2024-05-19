@@ -20,6 +20,7 @@ class Graph {
 
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
+	int t_degreeSum;
 
 	int* t_degSequence;
 	dst::List<vertex_t> t_componnets;
@@ -37,8 +38,8 @@ class Graph {
 
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degSequence(nullptr), t_colours(nullptr), t_discoveryTime(nullptr),
-		t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_degSequence(nullptr), t_colours(nullptr),
+		t_discoveryTime(nullptr), t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
 
 	void setGraphOrder(int order) {
 		t_numberVertices = order;
@@ -52,9 +53,12 @@ public:
 		t_adjancencyList = new dst::Vector<Edge>[t_numberVertices];
 	}
 
-	void setVertexDegree(vertex_t v, int degree) { t_adjancencyList[v - 1].resize(degree);}
-	void addVertex(int v, int u) { t_adjancencyList[v - 1].pushBack({u, 0}); }
-	void rememberDeg(int degree) { t_degSequence[degree] += 1; }
+	void setVertexDegree(vertex_t v, int degree) { t_adjancencyList[v - 1].resize(degree); }
+	void addVertex(vertex_t v, vertex_t u) { t_adjancencyList[v - 1].pushBack({u, 0}); }
+	void rememberDeg(int degree) {
+		t_degSequence[degree] += 1;
+		t_degreeSum += degree;
+	}
 
 	dst::Vector<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
@@ -76,11 +80,11 @@ public:
 
 	int countOfC4();
 
-	int complementEdges();
+	int complementEdges() const;
 
 	/* Printing */
 
-	void print();
+	void print() const;
 
 	void printDegSequence() const;
 
@@ -113,18 +117,21 @@ public:
 		t_adjancencyList = nullptr;
 
 		t_numberVertices = 0;
+		t_degreeSum = 0;
 	}
 
-	~Graph() {
-		clear();
-	};
+	~Graph() { clear(); };
 };
 
 template<typename T>
-void set(T* inTable, vertex_t forVertex, T toValue) { inTable[forVertex - 1] = toValue; }
+void set(T* inTable, vertex_t forVertex, T toValue) {
+	inTable[forVertex - 1] = toValue;
+}
 
 template<typename T>
-T get(const T* inTable, vertex_t ofVertex) { return inTable[ofVertex - 1]; }
+T get(const T* inTable, vertex_t ofVertex) {
+	return inTable[ofVertex - 1];
+}
 
 
 #endif // GRAPH_H

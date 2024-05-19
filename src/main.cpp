@@ -75,8 +75,8 @@ int main() {
 
 		printf("?\n"); // count C4
 
-		// printf("%d\n", graph.complementEdges());
-		printf("?\n");
+		printf("%d\n", graph.complementEdges());
+		// printf("?\n");
 
 		graph.clear();
 	}
