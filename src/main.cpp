@@ -9,6 +9,7 @@ void inputVertex(Graph& graph, vertex_t currentVertex) {
 	}
 
 	graph.rememberDeg(nNeighbours);
+	graph.updateDegreeSum(nNeighbours);
 	graph.setVertexDegree(currentVertex, nNeighbours);
 
 	for (int i = 0; i < nNeighbours - 1; ++i) {
@@ -16,13 +17,15 @@ void inputVertex(Graph& graph, vertex_t currentVertex) {
 		graph.addVertex(currentVertex, neighbour);
 	}
 	if (nNeighbours >= 1) {
-		graph.addVertex(currentVertex, inputNumber('\n'));
+		int neighbour = inputNumber('\n');
+		graph.addVertex(currentVertex, neighbour);
 	}
 }
 
 void inputGrapth(Graph& graph) {
 	int nVertices = inputNumber('\n');
 	graph.setGraphOrder(nVertices);
+	graph.initGrapthOrder(nVertices);
 
 	for (int i = 0; i < nVertices; ++i) {
 		inputVertex(graph, i + 1);
@@ -49,33 +52,34 @@ int main() {
 		COUNT++;
 		inputGrapth(graph);
 
+		// printf("?\n");
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		printf("%d\n", graph.numberOfComponents());
-		// printf("?\n");
+		// printf("%d\n", graph.numberOfComponents());
+		printf("?\n");
 
-		printBool(graph.isBipartite());
-		// printf("?\n");
+		// printBool(graph.isBipartite());
+		printf("?\n");
 
 		printf("?\n"); // eccentricity
 
 		// graph.isPlanar();
 		printf("?\n");
 
-		// printf("?\n"); // Greedy
-		graph.vertexColorsGreedy();
-		graph.printColours();
+		printf("?\n"); // Greedy
+		// graph.vertexColorsGreedy();
+		// graph.printColours();
 
 		printf("?\n"); // LF
-		graph.vertexColorsLF();
+		// graph.vertexColorsLF();
 		// graph.printColours();
 
 		printf("?\n"); // SLF
 
 		printf("?\n"); // count C4
 
-		printf("%d\n", graph.complementEdges());
+		printf("%lli\n", graph.complementEdges());
 		// printf("?\n");
 
 		graph.clear();

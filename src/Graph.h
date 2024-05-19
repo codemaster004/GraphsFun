@@ -11,6 +11,8 @@
 
 using vertex_t = int;
 
+using long_t = long long int;
+
 
 class Graph {
 	struct Edge {
@@ -20,7 +22,8 @@ class Graph {
 
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
-	int t_degreeSum;
+	long_t t_degreeSum;
+	int t_maximumDegree;
 
 	int* t_degSequence;
 	dst::List<vertex_t> t_componnets;
@@ -38,10 +41,10 @@ class Graph {
 
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_degSequence(nullptr), t_colours(nullptr),
-		t_discoveryTime(nullptr), t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_maximumDegree(0), t_degSequence(nullptr),
+		t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
 
-	void setGraphOrder(int order) {
+	void initGrapthOrder(int order) {
 		t_numberVertices = order;
 		t_degSequence = new int[order + 1];
 		for (int i = 0; i < order + 1; ++i) {
@@ -53,10 +56,19 @@ public:
 		t_adjancencyList = new dst::Vector<Edge>[t_numberVertices];
 	}
 
+	void setGraphOrder(int order) {
+		t_numberVertices = order;
+	}
+
 	void setVertexDegree(vertex_t v, int degree) { t_adjancencyList[v - 1].resize(degree); }
 	void addVertex(vertex_t v, vertex_t u) { t_adjancencyList[v - 1].pushBack({u, 0}); }
 	void rememberDeg(int degree) {
 		t_degSequence[degree] += 1;
+		if (degree > t_maximumDegree) {
+			t_maximumDegree = degree;
+		}
+	}
+	void updateDegreeSum(int degree) {
 		t_degreeSum += degree;
 	}
 
@@ -80,7 +92,7 @@ public:
 
 	int countOfC4();
 
-	int complementEdges() const;
+	[[nodiscard]] long long int complementEdges() const;
 
 	/* Printing */
 
@@ -118,6 +130,7 @@ public:
 
 		t_numberVertices = 0;
 		t_degreeSum = 0;
+		t_maximumDegree = 0;
 	}
 
 	~Graph() { clear(); };

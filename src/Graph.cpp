@@ -212,7 +212,7 @@ void Graph::vertexColorsLF() {
 	int smallestDegree = t_numberVertices;
 	vertex_t leastConnected = 0;
 	for (int i = 0; i < t_numberVertices; ++i) {
-		int degree = t_adjancencyList[i].getSize();
+		int degree = (int) t_adjancencyList[i].getSize();
 		degreeSequence[i] = degree;
 		if (degree < smallestDegree) {
 			smallestDegree = degree;
@@ -234,10 +234,26 @@ void Graph::vertexColorsLF() {
 }
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
-int Graph::complementEdges() const {
-	int numberOfEdgesForKGraph = t_numberVertices * (t_numberVertices - 1);
-	numberOfEdgesForKGraph -= t_degreeSum;
-	return numberOfEdgesForKGraph / 2;
+long long int Graph::complementEdges() const {
+	long long int numberOfEdgesForKGraph = 0;
+
+	// Safely compute the number of edges in a complete graph with the same number of vertices
+	if (t_numberVertices % 2 == 0) {
+		// (n / 2) * (n - 1)
+		long long int halfVertices = t_numberVertices / 2;
+		numberOfEdgesForKGraph = halfVertices * (t_numberVertices - 1);
+	} else {
+		// ((n - 1) / 2) * n
+		long long int halfVerticesMinusOne = (t_numberVertices - 1) / 2;
+		numberOfEdgesForKGraph = halfVerticesMinusOne * t_numberVertices;
+	}
+
+	// Divide first to prevent overflow
+	long long int halfDegreeSum = t_degreeSum / 2;
+	// Safely subtract (degree sum / 2)
+	numberOfEdgesForKGraph -= halfDegreeSum;
+
+	return numberOfEdgesForKGraph;
 }
 
 void Graph::print() const {
@@ -261,6 +277,7 @@ void Graph::printDegSequence() const {
 void Graph::printColours() const {
 	for (int i = 0; i < t_numberVertices; ++i) {
 		printf("%d ", t_colours[i]);
+		t_colours[i] = 0;
 	}
 	printf("\n");
 }
