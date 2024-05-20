@@ -95,8 +95,8 @@ int main() {
 	 *		a. Greedy
 	 *		b. LF
 	 *		c. SLF
-	 *	7. the number of different C4 subgraphs; Number of missing edges to complete Graph. // out: 5
-	 *	8. the number of the graph complement's edges; all complete edges - edges count;    // out: 81
+	 *	9. the number of different C4 subgraphs; Number of missing edges to complete Graph. // out: 5
+	 *	10. the number of the graph complement's edges; all complete edges - edges count;    // out: 81
 	 */
 
 	return 0;
