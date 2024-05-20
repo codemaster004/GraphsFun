@@ -234,28 +234,6 @@ void Graph::vertexColorsLF() {
 
 	delete[] degreesBuckets;
 	delete[] colorsUsed;
-	// int smallestDegree = t_numberVertices;
-	// vertex_t leastConnected = 0;
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	int degree = (int) t_adjancencyList[i].getSize();
-	// 	degreeSequence[i] = degree;
-	// 	if (degree < smallestDegree) {
-	// 		smallestDegree = degree;
-	// 		leastConnected = i + 1;
-	// 	}
-	// }
-	//
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// }
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	vertiveQueque.put(leastConnected);
-	// 	set(degreeSequence, leastConnected, 0);
-	// 	for (Edge neighbour: getNeighbours(leastConnected)) {
-	// 		degreeSequence[neighbour.vertex - 1] -= 1;
-	// 	}
-	// }
-
-	// delete[] degreeSequence;
 }
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
