@@ -1,6 +1,7 @@
 #include "Graph.h"
 #include "Utilities.h"
 
+#include "PriorityQueue.h"
 
 void inputVertex(Graph& graph, vertex_t current) {
 	int nNeighbours = inputNumber(' ');
