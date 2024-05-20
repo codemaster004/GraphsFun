@@ -2,23 +2,23 @@
 #include "Utilities.h"
 
 
-void inputVertex(Graph& graph, vertex_t currentVertex) {
+void inputVertex(Graph& graph, vertex_t current) {
 	int nNeighbours = inputNumber(' ');
 	if (nNeighbours == 0) {
 		getchar(); // um magic in the input
 	}
 
-	graph.rememberDeg(nNeighbours);
+	graph.rememberDeg(current, nNeighbours);
 	graph.updateDegreeSum(nNeighbours);
-	graph.setVertexDegree(currentVertex, nNeighbours);
+	graph.setVertexDegree(current, nNeighbours);
 
 	for (int i = 0; i < nNeighbours - 1; ++i) {
 		int neighbour = inputNumber(' ');
-		graph.addVertex(currentVertex, neighbour);
+		graph.addVertex(current, neighbour);
 	}
 	if (nNeighbours >= 1) {
 		int neighbour = inputNumber('\n');
-		graph.addVertex(currentVertex, neighbour);
+		graph.addVertex(current, neighbour);
 	}
 }
 
@@ -56,24 +56,24 @@ int main() {
 		graph.printDegSequence();
 		graph.removeDegreeSequence(); // no longer needed
 
-		// printf("%d\n", graph.numberOfComponents());
-		printf("?\n");
+		printf("%d\n", graph.numberOfComponents());
+		// printf("?\n");
 
-		// printBool(graph.isBipartite());
-		printf("?\n");
+		printBool(graph.isBipartite());
+		// printf("?\n");
 
 		printf("?\n"); // eccentricity
 
 		// graph.isPlanar();
 		printf("?\n");
 
-		printf("?\n"); // Greedy
-		// graph.vertexColorsGreedy();
-		// graph.printColours();
+		// printf("?\n"); // Greedy
+		graph.vertexColorsGreedy();
+		graph.printColours();
 
-		printf("?\n"); // LF
-		// graph.vertexColorsLF();
-		// graph.printColours();
+		// printf("?\n"); // LF
+		graph.vertexColorsLF();
+		graph.printColours();
 
 		printf("?\n"); // SLF
 

@@ -9,6 +9,8 @@
 #include "List.h"
 #include "Vector.h"
 
+#include <climits>
+
 using vertex_t = int;
 
 using long_t = long long int;
@@ -22,10 +24,13 @@ class Graph {
 
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
-	long_t t_degreeSum;
-	int t_maximumDegree;
 
-	int* t_degSequence;
+	int t_minimumDegree;
+	int t_maximumDegree;
+	int* t_degreeCounts;
+
+	long_t t_degreeSum;
+
 	dst::List<vertex_t> t_componnets;
 
 	int* t_colours;
@@ -39,16 +44,19 @@ class Graph {
 	bool bipartiteDfs(vertex_t current, int previousColor);
 	void dfs(vertex_t current, bool* visited);
 
+	void colorVertex(vertex_t vertex, int* colors, bool* colorsUsed);
+
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_maximumDegree(0), t_degSequence(nullptr),
-		t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr), t_lowPoints2(nullptr) {}
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(INT_MAX),
+		t_maximumDegree(0), t_degreeCounts(nullptr), t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr),
+		t_lowPoints2(nullptr) {}
 
 	void initGrapthOrder(int order) {
 		t_numberVertices = order;
-		t_degSequence = new int[order + 1];
+		t_degreeCounts = new int[order + 1];
 		for (int i = 0; i < order + 1; ++i) {
-			t_degSequence[i] = 0;
+			t_degreeCounts[i] = 0;
 		}
 
 		t_colours = new int[t_numberVertices];
@@ -56,21 +64,19 @@ public:
 		t_adjancencyList = new dst::Vector<Edge>[t_numberVertices];
 	}
 
-	void setGraphOrder(int order) {
-		t_numberVertices = order;
-	}
+	void setGraphOrder(int order) { t_numberVertices = order; }
 
 	void setVertexDegree(vertex_t v, int degree) { t_adjancencyList[v - 1].resize(degree); }
 	void addVertex(vertex_t v, vertex_t u) { t_adjancencyList[v - 1].pushBack({u, 0}); }
-	void rememberDeg(int degree) {
-		t_degSequence[degree] += 1;
+	void rememberDeg(vertex_t vertex, int degree) {
+		t_degreeCounts[degree] += 1;
 		if (degree > t_maximumDegree) {
 			t_maximumDegree = degree;
+		} else if (degree < t_minimumDegree) {
+			t_minimumDegree = degree;
 		}
 	}
-	void updateDegreeSum(int degree) {
-		t_degreeSum += degree;
-	}
+	void updateDegreeSum(int degree) { t_degreeSum += degree; }
 
 	dst::Vector<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
@@ -103,8 +109,8 @@ public:
 	void printColours() const;
 
 	void removeDegreeSequence() {
-		delete[] t_degSequence;
-		t_degSequence = nullptr;
+		delete[] t_degreeCounts;
+		t_degreeCounts = nullptr;
 	}
 
 	void resetColours() {
@@ -116,8 +122,8 @@ public:
 	void clear() {
 		t_componnets.clear();
 
-		delete[] t_degSequence;
-		t_degSequence = nullptr;
+		delete[] t_degreeCounts;
+		t_degreeCounts = nullptr;
 
 		delete[] t_colours;
 		t_colours = nullptr;

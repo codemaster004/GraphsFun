@@ -111,6 +111,33 @@ void Graph::dfs(vertex_t current, bool* visited) {
 		}
 	}
 }
+void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
+	int maxColorUsed = 0;
+
+	for (Edge neighbour: getNeighbours(vertex)) {
+		int neighbourColor = get(colors, neighbour.vertex);
+
+		if (neighbourColor != 0) {
+			colorsUsed[neighbourColor - 1] = false;
+
+			if (neighbourColor > maxColorUsed) {
+				maxColorUsed = neighbourColor;
+			}
+		}
+	}
+
+	int minColorPicked = 0;
+	for (int j = 0; j < maxColorUsed; ++j) {
+		if (colorsUsed[j] && minColorPicked == 0) {
+			minColorPicked = j + 1;
+		}
+		colorsUsed[j] = true;
+	}
+	if (minColorPicked == 0) {
+		minColorPicked = maxColorUsed + 1;
+	}
+	set(colors, vertex, minColorPicked);
+}
 
 int Graph::numberOfComponents() {
 	int dfsCount = 0;
@@ -170,67 +197,65 @@ void Graph::vertexEccentricity() {}
 void Graph::vertexColorsGreedy() {
 	resetColours();
 
-	auto* colorUsed = new bool[t_numberVertices];
+	auto* colorsUsed = new bool[t_numberVertices];
 	for (int i = 0; i < t_numberVertices; ++i) {
 		vertex_t current = i + 1;
 		if (get(t_colours, current) == 0) {
-			int maxColorUsed = 0;
-
-			for (Edge neighbour: getNeighbours(current)) {
-				int neighbourColor = get(t_colours, neighbour.vertex);
-
-				if (neighbourColor != 0) {
-					colorUsed[neighbourColor - 1] = false;
-
-					if (neighbourColor > maxColorUsed) {
-						maxColorUsed = neighbourColor;
-					}
-				}
-			}
-
-			int minColorPicked = 0;
-			for (int j = 0; j < maxColorUsed; ++j) {
-				if (colorUsed[j] && minColorPicked == 0) {
-					minColorPicked = j + 1;
-				}
-				colorUsed[j] = true;
-			}
-			if (minColorPicked == 0) {
-				minColorPicked = maxColorUsed + 1;
-			}
-			set(t_colours, current, minColorPicked);
+			colorVertex(current, t_colours, colorsUsed);
 		}
 	}
 
-	delete[] colorUsed;
+	delete[] colorsUsed;
 }
 void Graph::vertexColorsLF() {
-	dst::Queue<vertex_t> vertiveQueque;
-	auto* degreeSequence = new int[t_numberVertices];
-	dst::List<Edge> vertexDegrees;
+	int nBuckets = t_maximumDegree - t_minimumDegree + 1;
+	auto* degreesBuckets = new dst::List<vertex_t>[nBuckets];
 
-	int smallestDegree = t_numberVertices;
-	vertex_t leastConnected = 0;
 	for (int i = 0; i < t_numberVertices; ++i) {
 		int degree = (int) t_adjancencyList[i].getSize();
-		degreeSequence[i] = degree;
-		if (degree < smallestDegree) {
-			smallestDegree = degree;
-			leastConnected = i + 1;
-		}
+		degreesBuckets[degree - t_minimumDegree].push(i + 1);
 	}
 
-	for (int i = 0; i < t_numberVertices; ++i) {
-	}
-	for (int i = 0; i < t_numberVertices; ++i) {
-		vertiveQueque.put(leastConnected);
-		set(degreeSequence, leastConnected, 0);
-		for (Edge neighbour: getNeighbours(leastConnected)) {
-			degreeSequence[neighbour.vertex - 1] -= 1;
+	int verticesColored = 0;
+	int currentBucket = nBuckets-1;
+
+	auto* colorsUsed = new bool[t_maximumDegree + 1];
+	while (verticesColored < t_numberVertices) {
+		for (vertex_t current: degreesBuckets[currentBucket]) {
+
+			if (get(t_colours, current) == 0) {
+				colorVertex(current, t_colours, colorsUsed);
+			}
+
+			verticesColored++;
 		}
+		currentBucket--;
 	}
 
-	delete[] degreeSequence;
+	delete[] degreesBuckets;
+	delete[] colorsUsed;
+	// int smallestDegree = t_numberVertices;
+	// vertex_t leastConnected = 0;
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	int degree = (int) t_adjancencyList[i].getSize();
+	// 	degreeSequence[i] = degree;
+	// 	if (degree < smallestDegree) {
+	// 		smallestDegree = degree;
+	// 		leastConnected = i + 1;
+	// 	}
+	// }
+	//
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// }
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	vertiveQueque.put(leastConnected);
+	// 	set(degreeSequence, leastConnected, 0);
+	// 	for (Edge neighbour: getNeighbours(leastConnected)) {
+	// 		degreeSequence[neighbour.vertex - 1] -= 1;
+	// 	}
+	// }
+
+	// delete[] degreeSequence;
 }
 void Graph::vertexColorsSLF() {}
 int Graph::countOfC4() { return 0; }
@@ -267,7 +292,7 @@ void Graph::print() const {
 
 void Graph::printDegSequence() const {
 	for (int i = t_numberVertices; i >= 0; --i) {
-		for (int j = 0; j < t_degSequence[i]; ++j) {
+		for (int j = 0; j < t_degreeCounts[i]; ++j) {
 			printf("%d ", i);
 		}
 	}
