@@ -103,12 +103,63 @@ bool Graph::isPlanar() {
 	return false;
 }
 
-void Graph::dfs(vertex_t current, bool* visited) {
+void Graph::dfs(vertex_t current, bool* visited, int& dfsCount) {
+	dfsCount++;
 	set(visited, current, true);
 	for (Edge neighbour: getNeighbours(current)) {
 		if (!get(visited, neighbour.vertex)) {
-			dfs(neighbour.vertex, visited);
+			dfs(neighbour.vertex, visited, dfsCount);
 		}
+	}
+}
+void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int* eccentricity) {
+	dst::Vector<vertex_t> componentVertices(componentConsistency);
+	int currentComponentIndex = 0;
+	componentVertices[0] = startingPoint;
+
+	bool firstIteration = true;
+	while (currentComponentIndex < componentConsistency) {
+		auto* distance = new int[t_numberVertices];
+		for (int i = 0; i < t_numberVertices; ++i) {
+			distance[i] = -1;
+		}
+
+		dst::Vector<vertex_t> bfsQueue(componentConsistency);
+		int bfsIndex = 0;
+
+		vertex_t currentComponentVertex = componentVertices[currentComponentIndex];
+		bfsQueue[0] = currentComponentVertex;
+		set(distance, currentComponentVertex, 0);
+
+		// todo: finish this shit
+		int maxDistance = -1;
+		int insertedVerticesCount = 1;
+		while (insertedVerticesCount < componentConsistency) {
+			vertex_t current = bfsQueue[bfsIndex++];
+
+			int currentDistance = get(distance, current);
+			if (currentDistance > maxDistance) {
+				maxDistance = currentDistance;
+			}
+
+			for (Edge neighbour: getNeighbours(current)) {
+				if (get(distance, neighbour.vertex) == -1) {
+					set(distance, neighbour.vertex, currentDistance + 1);
+					bfsQueue[insertedVerticesCount++] = neighbour.vertex;
+
+					if (firstIteration) {
+						componentVertices[insertedVerticesCount - 1] = neighbour.vertex;
+					}
+				}
+			}
+		}
+
+		set(eccentricity, currentComponentVertex, maxDistance + 1);
+
+		currentComponentIndex++;
+
+		delete[] distance;
+		firstIteration = false;
 	}
 }
 void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
@@ -140,8 +191,6 @@ void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
 }
 
 int Graph::numberOfComponents() {
-	int dfsCount = 0;
-
 	// t_discoveryTime = new int[t_numberVertices];
 	// t_lowPoints1 = new int[t_numberVertices];
 	// t_lowPoints2 = new int[t_numberVertices];
@@ -153,8 +202,9 @@ int Graph::numberOfComponents() {
 
 	for (int i = 0; i < t_numberVertices; ++i) {
 		if (!visited[i]) {
-			t_componnets.push(i + 1);
-			dfs(i + 1, visited);
+			int dfsCount = 0;
+			dfs(i + 1, visited, dfsCount);
+			t_componnets.push({i + 1, dfsCount});
 			// lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 		}
 	}
@@ -184,8 +234,8 @@ bool Graph::isBipartite() {
 	resetColours();
 
 	bool bipartite = true;
-	for (vertex_t componnet: t_componnets) {
-		bipartite = bipartiteDfs(componnet, 2);
+	for (auto componnet: t_componnets) {
+		bipartite = bipartiteDfs(componnet.vertex, 2);
 		if (!bipartite) {
 			break;
 		}
@@ -193,7 +243,20 @@ bool Graph::isBipartite() {
 
 	return bipartite;
 }
-void Graph::vertexEccentricity() {}
+void Graph::vertexEccentricity() {
+	auto* verticesEccentricity = new int[t_numberVertices];
+	for (VertexInfo component: t_componnets) {
+		if (component.info == 1) {
+			set(verticesEccentricity, component.vertex, 0);
+		} else {
+			eccenricityBfs(component.vertex, component.info, verticesEccentricity);
+		}
+	}
+	for (int i = 0; i < t_numberVertices; ++i) {
+		printf("%d ", verticesEccentricity[i]);
+	}
+	printf("\n");
+}
 void Graph::vertexColorsGreedy() {
 	resetColours();
 
@@ -217,7 +280,7 @@ void Graph::vertexColorsLF() {
 	}
 
 	int verticesColored = 0;
-	int currentBucket = nBuckets-1;
+	int currentBucket = nBuckets - 1;
 
 	auto* colorsUsed = new bool[t_maximumDegree + 1];
 	while (verticesColored < t_numberVertices) {

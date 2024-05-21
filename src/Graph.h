@@ -22,6 +22,8 @@ class Graph {
 		int info;
 	};
 
+	using VertexInfo = Edge;
+
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
 
@@ -31,7 +33,7 @@ class Graph {
 
 	long_t t_degreeSum;
 
-	dst::List<vertex_t> t_componnets;
+	dst::List<VertexInfo> t_componnets;
 
 	int* t_colours;
 
@@ -42,7 +44,9 @@ class Graph {
 
 	void lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2);
 	bool bipartiteDfs(vertex_t current, int previousColor);
-	void dfs(vertex_t current, bool* visited);
+	void dfs(vertex_t current, bool* visited, int& dfsCount);
+
+	void eccenricityBfs(vertex_t startingPoint, int componentConsistency, int* eccentricity);
 
 	void colorVertex(vertex_t vertex, int* colors, bool* colorsUsed);
 
