@@ -131,7 +131,6 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 		bfsQueue[0] = currentComponentVertex;
 		set(distance, currentComponentVertex, 0);
 
-		// todo: finish this shit
 		int maxDistance = -1;
 		int insertedVerticesCount = 1;
 		while (insertedVerticesCount < componentConsistency) {
@@ -299,7 +298,33 @@ void Graph::vertexColorsLF() {
 	delete[] colorsUsed;
 }
 void Graph::vertexColorsSLF() {}
-int Graph::countOfC4() { return 0; }
+
+int Graph::countOfC4() {
+	struct Edge {
+		vertex_t v;
+		vertex_t u;
+
+		bool operator<(const Edge other) const {
+			return v < other.v || (v == other.v && u < other.u);
+		}
+	};
+
+	// for (int vertexIndex = 0; vertexIndex < t_numberVertices; ++vertexIndex) {
+	//
+	// 		auto& neighbours = getNeighbours(vertexIndex);
+	// 		for (int vIndex = 0; vIndex < neighbours.getSize(); ++vIndex) {
+	// 			for (int uIndex = vIndex+1; uIndex < neighbours.getSize(); ++uIndex) {
+	// 				// for (int i = 0; i < t_adjancencyList[vIndex].getSize(); ++i) {
+	// 				// 	if (t_adjancencyList[vIndex][i].vertex == 1) {
+	// 				//
+	// 				// 	}
+	// 				// }
+	// 				// edgesCombinations.insert({neighbourV, neighbours[j].vertex});
+	// 			}
+	// 		}
+	// }
+	return 0;
+}
 long long int Graph::complementEdges() const {
 	long long int numberOfEdgesForKGraph = 0;
 

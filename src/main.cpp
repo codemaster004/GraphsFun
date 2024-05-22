@@ -79,6 +79,7 @@ int main() {
 
 		printf("?\n"); // SLF
 
+		graph.countOfC4();
 		printf("?\n"); // count C4
 
 		printf("%lli\n", graph.complementEdges());
