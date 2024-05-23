@@ -1,7 +1,19 @@
 #include "Graph.h"
 #include "Utilities.h"
 
-#include "PriorityQueue.h"
+
+template<typename T>
+void insertionSort(T* array, int size) {
+	for (int i = 0; i < size; ++i) {
+		T value = array[i];
+		int j = i - 1;
+		while (j >= 0 && value < array[j]) {
+			array[j + 1] = array[j];
+			j--;
+		}
+		array[j + 1] = value;
+	}
+}
 
 void inputVertex(Graph& graph, vertex_t current) {
 	int nNeighbours = inputNumber(' ');
@@ -21,6 +33,7 @@ void inputVertex(Graph& graph, vertex_t current) {
 		int neighbour = inputNumber('\n');
 		graph.addVertex(current, neighbour);
 	}
+	// insertionSort(graph.getRawNeighboursArray(current), nNeighbours);
 }
 
 void inputGrapth(Graph& graph) {
@@ -77,7 +90,9 @@ int main() {
 		graph.vertexColorsLF();
 		graph.printColours();
 
-		printf("?\n"); // SLF
+		// printf("?\n"); // SLF
+		graph.vertexColorsSLF();
+		graph.printColours();
 
 		graph.countOfC4();
 		printf("?\n"); // count C4

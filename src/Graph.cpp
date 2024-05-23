@@ -7,6 +7,8 @@
  * @date 30/04/2024
  */
 #include "Graph.h"
+
+#include "PriorityQueue.h"
 #include "Utilities.h"
 
 void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2, const int* dfsValues,
@@ -56,24 +58,24 @@ void Graph::lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, in
 	set(lowPoints1, current, dfsCounter);
 	set(lowPoints2, current, dfsCounter);
 
-	for (Edge& neighbour: getNeighbours(current)) {
+	for (auto& [vertex, weight]: getNeighbours(current)) {
 
-		if (get(dfsDiscovery, neighbour.vertex) != 0) {
-			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
+		if (get(dfsDiscovery, vertex) != 0) {
+			updateLowpoints(current, vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
 		} else {
-			lowPointDfs(neighbour.vertex, dfsCounter, dfsDiscovery, lowPoints1, lowPoints2);
-			updateLowpoints(current, neighbour.vertex, lowPoints1, lowPoints2, dfsDiscovery, true);
+			lowPointDfs(vertex, dfsCounter, dfsDiscovery, lowPoints1, lowPoints2);
+			updateLowpoints(current, vertex, lowPoints1, lowPoints2, dfsDiscovery, true);
 		}
 
 		// is a frond
-		if (get(dfsDiscovery, neighbour.vertex) < get(dfsDiscovery, current)) {
-			neighbour.info = 2 * get(dfsDiscovery, neighbour.vertex);
-		} else if (get(lowPoints2, neighbour.vertex) == get(dfsDiscovery, current)) {
-			neighbour.info = 2 * get(lowPoints1, neighbour.vertex);
-		} else if (get(lowPoints2, neighbour.vertex) < get(dfsDiscovery, current)) {
-			neighbour.info = 2 * get(lowPoints1, neighbour.vertex) + 1;
+		if (get(dfsDiscovery, vertex) < get(dfsDiscovery, current)) {
+			weight = 2 * get(dfsDiscovery, vertex);
+		} else if (get(lowPoints2, vertex) == get(dfsDiscovery, current)) {
+			weight = 2 * get(lowPoints1, vertex);
+		} else if (get(lowPoints2, vertex) < get(dfsDiscovery, current)) {
+			weight = 2 * get(lowPoints1, vertex) + 1;
 		} else {
-			neighbour.info = get(dfsDiscovery, neighbour.vertex);
+			weight = get(dfsDiscovery, vertex);
 		}
 	}
 }
@@ -106,9 +108,9 @@ bool Graph::isPlanar() {
 void Graph::dfs(vertex_t current, bool* visited, int& dfsCount) {
 	dfsCount++;
 	set(visited, current, true);
-	for (Edge neighbour: getNeighbours(current)) {
-		if (!get(visited, neighbour.vertex)) {
-			dfs(neighbour.vertex, visited, dfsCount);
+	for (auto [vertex, _]: getNeighbours(current)) {
+		if (!get(visited, vertex)) {
+			dfs(vertex, visited, dfsCount);
 		}
 	}
 }
@@ -141,13 +143,13 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 				maxDistance = currentDistance;
 			}
 
-			for (Edge neighbour: getNeighbours(current)) {
-				if (get(distance, neighbour.vertex) == -1) {
-					set(distance, neighbour.vertex, currentDistance + 1);
-					bfsQueue[insertedVerticesCount++] = neighbour.vertex;
+			for (auto [vertex, _]: getNeighbours(current)) {
+				if (get(distance, vertex) == -1) {
+					set(distance, vertex, currentDistance + 1);
+					bfsQueue[insertedVerticesCount++] = vertex;
 
 					if (firstIteration) {
-						componentVertices[insertedVerticesCount - 1] = neighbour.vertex;
+						componentVertices[insertedVerticesCount - 1] = vertex;
 					}
 				}
 			}
@@ -164,10 +166,9 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
 	int maxColorUsed = 0;
 
-	for (Edge neighbour: getNeighbours(vertex)) {
-		int neighbourColor = get(colors, neighbour.vertex);
+	for (auto [vertex, _]: getNeighbours(vertex)) {
 
-		if (neighbourColor != 0) {
+		if (int neighbourColor = get(colors, vertex); neighbourColor != 0) {
 			colorsUsed[neighbourColor - 1] = false;
 
 			if (neighbourColor > maxColorUsed) {
@@ -216,10 +217,9 @@ bool Graph::bipartiteDfs(vertex_t current, int previousColor) {
 	int newColor = previousColor % 2 + 1;
 	set(t_colours, current, newColor);
 
-	for (Edge neighbour: getNeighbours(current)) {
-		int neighbourColor = get(t_colours, neighbour.vertex);
-		if (neighbourColor == 0) {
-			if (!bipartiteDfs(neighbour.vertex, newColor)) {
+	for (auto [vertex, _]: getNeighbours(current)) {
+		if (int neighbourColor = get(t_colours, vertex); neighbourColor == 0) {
+			if (!bipartiteDfs(vertex, newColor)) {
 				return false;
 			}
 		} else if (neighbourColor == newColor) {
@@ -244,11 +244,11 @@ bool Graph::isBipartite() {
 }
 void Graph::vertexEccentricity() {
 	auto* verticesEccentricity = new int[t_numberVertices];
-	for (VertexInfo component: t_componnets) {
-		if (component.info == 1) {
-			set(verticesEccentricity, component.vertex, 0);
+	for (auto [vertex, componentSize]: t_componnets) {
+		if (componentSize == 1) {
+			set(verticesEccentricity, vertex, 0);
 		} else {
-			eccenricityBfs(component.vertex, component.info, verticesEccentricity);
+			eccenricityBfs(vertex, componentSize, verticesEccentricity);
 		}
 	}
 	for (int i = 0; i < t_numberVertices; ++i) {
@@ -261,8 +261,7 @@ void Graph::vertexColorsGreedy() {
 
 	auto* colorsUsed = new bool[t_numberVertices];
 	for (int i = 0; i < t_numberVertices; ++i) {
-		vertex_t current = i + 1;
-		if (get(t_colours, current) == 0) {
+		if (vertex_t current = i + 1; get(t_colours, current) == 0) {
 			colorVertex(current, t_colours, colorsUsed);
 		}
 	}
@@ -297,7 +296,24 @@ void Graph::vertexColorsLF() {
 	delete[] degreesBuckets;
 	delete[] colorsUsed;
 }
-void Graph::vertexColorsSLF() {}
+
+
+bool Graph::slfStructCompare(const SaturationInfo& a, const SaturationInfo& b) {
+	if (*a.saturationValue_p > *b.saturationValue_p) {
+		return true;
+	}
+	if (*a.saturationValue_p < *b.saturationValue_p) {
+		return false;
+	}
+	return a.degree > b.degree || (a.degree == b.degree && a.vertex < b.vertex);
+}
+
+void Graph::vertexColorsSLF() {
+	for (VertexInfo componnet: t_componnets) {
+		dst::PriorityQueue<SaturationInfo>(componnet.info, slfStructCompare);
+
+	}
+}
 
 int Graph::countOfC4() {
 	struct Edge {
@@ -349,8 +365,8 @@ long long int Graph::complementEdges() const {
 
 void Graph::print() const {
 	for (int i = 0; i < t_numberVertices; ++i) {
-		for (Edge vertexInfo: t_adjancencyList[i]) {
-			printf(" %d: %d, ", vertexInfo.vertex, vertexInfo.info);
+		for (auto [vertex, info]: t_adjancencyList[i]) {
+			printf(" %d: %d, ", vertex, info);
 		}
 		printf("\n");
 	}

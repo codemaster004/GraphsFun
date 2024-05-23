@@ -44,7 +44,7 @@ namespace dst {
 
 	public:
 		// Default Constructor
-		explicit Vector<T>(size_t initialSize = 0) : size(0), capacity(initialSize), data(new T[initialSize]) {}
+		explicit Vector(size_t initialSize = 0) : size(0), capacity(initialSize), data(new T[initialSize]) {}
 
 
 		// Copy Constructor
@@ -106,6 +106,11 @@ namespace dst {
 		void remove(size_t index) {
 			shift_left(index);
 			--size;
+		}
+
+
+		T* getRawPointer() {
+			return data;
 		}
 
 

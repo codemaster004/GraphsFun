@@ -54,6 +54,12 @@ namespace dst {
 			t_heapArray = new T[t_size + 1];
 		}
 
+		explicit PriorityQueue(int size, bool (*compareFunction)(const T&, const T&)) {
+			t_size = 0;
+			t_capacity = size;
+			t_heapArray = new T[t_size + 1];
+		}
+
 		void insert(const T& value) {
 			if (t_size >= t_capacity)
 				return;

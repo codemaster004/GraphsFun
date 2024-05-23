@@ -20,9 +20,23 @@ class Graph {
 	struct Edge {
 		vertex_t vertex;
 		int info;
+
+		bool operator<(const Edge& other) const {
+			return vertex < other.vertex;
+		}
+
+		bool operator>(const Edge& other) const {
+			return vertex > other.vertex;
+		}
+	};
+	using VertexInfo = Edge;
+
+	struct SaturationInfo {
+		int* saturationValue_p;
+		int degree;
+		int vertex;
 	};
 
-	using VertexInfo = Edge;
 
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
@@ -49,6 +63,8 @@ class Graph {
 	void eccenricityBfs(vertex_t startingPoint, int componentConsistency, int* eccentricity);
 
 	void colorVertex(vertex_t vertex, int* colors, bool* colorsUsed);
+
+	static bool slfStructCompare(const SaturationInfo& a, const SaturationInfo& b);
 
 public:
 	Graph() :
@@ -81,6 +97,10 @@ public:
 		}
 	}
 	void updateDegreeSum(int degree) { t_degreeSum += degree; }
+
+	Edge* getRawNeighboursArray(vertex_t forVertex) {
+		return t_adjancencyList[forVertex - 1].getRawPointer();
+	}
 
 	dst::Vector<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 
