@@ -11,9 +11,10 @@
 
 #include <climits>
 
-using vertex_t = int;
 
 using long_t = long long int;
+
+using vertex_t = int;
 
 
 class Graph {
@@ -97,6 +98,9 @@ public:
 		}
 	}
 	void updateDegreeSum(int degree) { t_degreeSum += degree; }
+	int getDegree(vertex_t vertex) {
+		return (int) t_adjancencyList[vertex - 1].getSize();
+	}
 
 	Edge* getRawNeighboursArray(vertex_t forVertex) {
 		return t_adjancencyList[forVertex - 1].getRawPointer();

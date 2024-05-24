@@ -11,6 +11,7 @@
 #include "PriorityQueue.h"
 #include "Utilities.h"
 
+
 void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int* lowPoints2, const int* dfsValues,
 					 bool useLowPoints) {
 	int currentLow1 = lowPoints1[currect - 1];
@@ -163,10 +164,10 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 		firstIteration = false;
 	}
 }
-void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
+void Graph::colorVertex(vertex_t current, int* colors, bool* colorsUsed) {
 	int maxColorUsed = 0;
 
-	for (auto [vertex, _]: getNeighbours(vertex)) {
+	for (auto& [vertex, _]: getNeighbours(current)) {
 
 		if (int neighbourColor = get(colors, vertex); neighbourColor != 0) {
 			colorsUsed[neighbourColor - 1] = false;
@@ -187,7 +188,7 @@ void Graph::colorVertex(vertex_t vertex, int* colors, bool* colorsUsed) {
 	if (minColorPicked == 0) {
 		minColorPicked = maxColorUsed + 1;
 	}
-	set(colors, vertex, minColorPicked);
+	set(colors, current, minColorPicked);
 }
 
 int Graph::numberOfComponents() {
@@ -309,10 +310,15 @@ bool Graph::slfStructCompare(const SaturationInfo& a, const SaturationInfo& b) {
 }
 
 void Graph::vertexColorsSLF() {
+	auto* saturations = new int[t_numberVertices];
+	auto* queueIndexTable = new int[t_numberVertices];
+
 	for (VertexInfo componnet: t_componnets) {
 		dst::PriorityQueue<SaturationInfo>(componnet.info, slfStructCompare);
-
 	}
+
+	delete[] queueIndexTable;
+	delete[] saturations;
 }
 
 int Graph::countOfC4() {
@@ -320,26 +326,71 @@ int Graph::countOfC4() {
 		vertex_t v;
 		vertex_t u;
 
-		bool operator<(const Edge other) const {
-			return v < other.v || (v == other.v && u < other.u);
-		}
+		bool operator<(const Edge other) const { return v < other.v || (v == other.v && u < other.u); }
 	};
 
-	// for (int vertexIndex = 0; vertexIndex < t_numberVertices; ++vertexIndex) {
+	long c4Count = 0;
+
+	for (int i = 0; i < t_numberVertices; ++i) {
+		for (int j = i + 1; j < t_numberVertices; ++j) {
+			int degreeV = getDegree(i + 1);
+			int indexV = 0;
+			int degreeU = getDegree(j + 1);
+			int indexU = 0;
+
+			long neighbourCount = 0;
+			while (indexV < degreeV && indexU < degreeU) {
+				int neighbourOfV = t_adjancencyList[i][indexV].vertex;
+				int neighbourOfU = t_adjancencyList[j][indexU].vertex;
+				if (neighbourOfV == neighbourOfU) {
+					neighbourCount++;
+					indexV++;
+					indexU++;
+				} else if (neighbourOfV < neighbourOfU) {
+					indexV++;
+				} else {
+					indexU++;
+				}
+			}
+
+			c4Count += neighbourCount * (neighbourCount - 1) / 2;
+		}
+	}
+	c4Count /= 2;
+
+
+	// c4Count = 0;
+	// int* countTable = new int[t_numberVertices];
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	countTable[i] = 0;
+	// }
 	//
-	// 		auto& neighbours = getNeighbours(vertexIndex);
-	// 		for (int vIndex = 0; vIndex < neighbours.getSize(); ++vIndex) {
-	// 			for (int uIndex = vIndex+1; uIndex < neighbours.getSize(); ++uIndex) {
-	// 				// for (int i = 0; i < t_adjancencyList[vIndex].getSize(); ++i) {
-	// 				// 	if (t_adjancencyList[vIndex][i].vertex == 1) {
-	// 				//
-	// 				// 	}
-	// 				// }
-	// 				// edgesCombinations.insert({neighbourV, neighbours[j].vertex});
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	int degreeV = (int) t_adjancencyList[i].getSize();
+	//
+	// 	for (auto neighbour: getNeighbours(i + 1)) {
+	// 		int degreeU = getDegree(neighbour.vertex);
+	// 		if (degreeU < degreeV || (degreeU == degreeV && neighbour.vertex < i + 1)) {
+	// 			for (auto secondNeighbour: getNeighbours(neighbour.vertex)) {
+	// 				int degreeW = getDegree(secondNeighbour.vertex);
+	// 				if (degreeW < degreeV || (degreeW == degreeV && secondNeighbour.vertex < i + 1)) {
+	// 					int countForVertex = get(countTable, secondNeighbour.vertex);
+	// 					c4Count += countForVertex;
+	// 					set(countTable, secondNeighbour.vertex, countForVertex + 1);
+	// 				}
 	// 			}
 	// 		}
+	// 	}
+	// 	for (auto neighbour: getNeighbours(i + 1)) {
+	// 		int degreeU = getDegree(neighbour.vertex);
+	// 		if (degreeU < degreeV || (degreeU == degreeV && neighbour.vertex < i + 1)) {
+	// 			for (auto secondNeighbour: getNeighbours(neighbour.vertex)) {
+	// 				set(countTable, secondNeighbour.vertex, 0);
+	// 			}
+	// 		}
+	// 	}
 	// }
-	return 0;
+	return (int) c4Count;
 }
 long long int Graph::complementEdges() const {
 	long long int numberOfEdgesForKGraph = 0;
