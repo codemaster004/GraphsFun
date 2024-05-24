@@ -115,28 +115,28 @@ void Graph::dfs(vertex_t current, bool* visited, int& dfsCount) {
 		}
 	}
 }
-void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int* eccentricity) {
-	dst::Vector<vertex_t> componentVertices(componentConsistency);
-	int currentComponentIndex = 0;
-	componentVertices[0] = startingPoint;
+void Graph::eccenricityBfs(vertex_t startingPoint, int* eccentricity, int currentComponentIndex) {
+	int vertexIndex = 0;
+	t_componentsVertices[currentComponentIndex][0] = startingPoint;
 
 	bool firstIteration = true;
-	while (currentComponentIndex < componentConsistency) {
+	int componentConsistencyNumber = (int) t_componentsVertices[currentComponentIndex].getCapacity();
+	while (vertexIndex < componentConsistencyNumber) {
 		auto* distance = new int[t_numberVertices];
 		for (int i = 0; i < t_numberVertices; ++i) {
 			distance[i] = -1;
 		}
 
-		dst::Vector<vertex_t> bfsQueue(componentConsistency);
+		dst::Vector<vertex_t> bfsQueue(componentConsistencyNumber);
 		int bfsIndex = 0;
 
-		vertex_t currentComponentVertex = componentVertices[currentComponentIndex];
+		vertex_t currentComponentVertex = t_componentsVertices[currentComponentIndex][vertexIndex];
 		bfsQueue[0] = currentComponentVertex;
 		set(distance, currentComponentVertex, 0);
 
 		int maxDistance = -1;
 		int insertedVerticesCount = 1;
-		while (insertedVerticesCount < componentConsistency) {
+		while (insertedVerticesCount < componentConsistencyNumber) {
 			vertex_t current = bfsQueue[bfsIndex++];
 
 			int currentDistance = get(distance, current);
@@ -150,7 +150,7 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 					bfsQueue[insertedVerticesCount++] = vertex;
 
 					if (firstIteration) {
-						componentVertices[insertedVerticesCount - 1] = vertex;
+						t_componentsVertices[currentComponentIndex][insertedVerticesCount - 1] = vertex;
 					}
 				}
 			}
@@ -158,7 +158,7 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int componentConsistency, int
 
 		set(eccentricity, currentComponentVertex, maxDistance + 1);
 
-		currentComponentIndex++;
+		vertexIndex++;
 
 		delete[] distance;
 		firstIteration = false;
@@ -210,6 +210,8 @@ int Graph::numberOfComponents() {
 		}
 	}
 
+	t_componentsVertices = new dst::Vector<vertex_t>[t_componnets.getSize()];
+
 	delete[] visited;
 	return t_componnets.getSize();
 }
@@ -245,12 +247,22 @@ bool Graph::isBipartite() {
 }
 void Graph::vertexEccentricity() {
 	auto* verticesEccentricity = new int[t_numberVertices];
+
+	int currentComponentIndex = 0;
 	for (auto [vertex, componentSize]: t_componnets) {
+		t_componentsVertices[currentComponentIndex].resize(componentSize);
 		if (componentSize == 1) {
 			set(verticesEccentricity, vertex, 0);
+			t_componentsVertices[currentComponentIndex].pushBack(vertex);
+		} else if(componentSize == 2) {
+			set(verticesEccentricity, vertex, 1);
+			set(verticesEccentricity, getNeighbours(vertex)[0].vertex, 1);
+			t_componentsVertices[currentComponentIndex].pushBack(vertex);
+			t_componentsVertices[currentComponentIndex].pushBack(getNeighbours(vertex)[0].vertex);
 		} else {
-			eccenricityBfs(vertex, componentSize, verticesEccentricity);
+			eccenricityBfs(vertex, verticesEccentricity, currentComponentIndex);
 		}
+		currentComponentIndex++;
 	}
 	for (int i = 0; i < t_numberVertices; ++i) {
 		printf("%d ", verticesEccentricity[i]);
@@ -321,42 +333,70 @@ void Graph::vertexColorsSLF() {
 	delete[] saturations;
 }
 
-int Graph::countOfC4() {
-	struct Edge {
-		vertex_t v;
-		vertex_t u;
+long long int Graph::countOfC4() {
 
-		bool operator<(const Edge other) const { return v < other.v || (v == other.v && u < other.u); }
-	};
+	long long int c4Count = 0;
 
-	long c4Count = 0;
+	for (int i = 0; i < t_componnets.getSize(); ++i) {
+		int componentSize = (int) t_componentsVertices[i].getCapacity();
+		if (componentSize < 4) {
+			continue;
+		}
+		for (int v = 0; v < componentSize; ++v) {
+			int degreeV = getDegree(v + 1);
+			for (int u = v+1; u < componentSize; ++u) {
+				int degreeU = getDegree(u + 1);
+				int indexU = 0;
+				int indexV = 0;
 
-	for (int i = 0; i < t_numberVertices; ++i) {
-		for (int j = i + 1; j < t_numberVertices; ++j) {
-			int degreeV = getDegree(i + 1);
-			int indexV = 0;
-			int degreeU = getDegree(j + 1);
-			int indexU = 0;
-
-			long neighbourCount = 0;
-			while (indexV < degreeV && indexU < degreeU) {
-				int neighbourOfV = t_adjancencyList[i][indexV].vertex;
-				int neighbourOfU = t_adjancencyList[j][indexU].vertex;
-				if (neighbourOfV == neighbourOfU) {
-					neighbourCount++;
-					indexV++;
-					indexU++;
-				} else if (neighbourOfV < neighbourOfU) {
-					indexV++;
-				} else {
-					indexU++;
+				long long int neighbourCount = 0;
+				while (indexV < degreeV && indexU < degreeU) {
+					int neighbourOfV = t_adjancencyList[v][indexV].vertex;
+					int neighbourOfU = t_adjancencyList[u][indexU].vertex;
+					if (neighbourOfV == neighbourOfU) {
+						neighbourCount++;
+						indexV++;
+						indexU++;
+					} else if (neighbourOfV < neighbourOfU) {
+						indexV++;
+					} else {
+						indexU++;
+					}
 				}
-			}
 
-			c4Count += neighbourCount * (neighbourCount - 1) / 2;
+				c4Count += neighbourCount * (neighbourCount - 1) / 2;
+			}
 		}
 	}
+
 	c4Count /= 2;
+
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	for (int j = i + 1; j < t_numberVertices; ++j) {
+	// 		int degreeV = getDegree(i + 1);
+	// 		int indexV = 0;
+	// 		int degreeU = getDegree(j + 1);
+	// 		int indexU = 0;
+	//
+	// 		long neighbourCount = 0;
+	// 		while (indexV < degreeV && indexU < degreeU) {
+	// 			int neighbourOfV = t_adjancencyList[i][indexV].vertex;
+	// 			int neighbourOfU = t_adjancencyList[j][indexU].vertex;
+	// 			if (neighbourOfV == neighbourOfU) {
+	// 				neighbourCount++;
+	// 				indexV++;
+	// 				indexU++;
+	// 			} else if (neighbourOfV < neighbourOfU) {
+	// 				indexV++;
+	// 			} else {
+	// 				indexU++;
+	// 			}
+	// 		}
+	//
+	// 		c4Count += neighbourCount * (neighbourCount - 1) / 2;
+	// 	}
+	// }
+	// c4Count /= 2;
 
 
 	// c4Count = 0;
@@ -390,7 +430,7 @@ int Graph::countOfC4() {
 	// 		}
 	// 	}
 	// }
-	return (int) c4Count;
+	return c4Count;
 }
 long long int Graph::complementEdges() const {
 	long long int numberOfEdgesForKGraph = 0;

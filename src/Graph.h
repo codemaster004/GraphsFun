@@ -49,6 +49,7 @@ class Graph {
 	long_t t_degreeSum;
 
 	dst::List<VertexInfo> t_componnets;
+	dst::Vector<vertex_t>* t_componentsVertices;
 
 	int* t_colours;
 
@@ -61,7 +62,7 @@ class Graph {
 	bool bipartiteDfs(vertex_t current, int previousColor);
 	void dfs(vertex_t current, bool* visited, int& dfsCount);
 
-	void eccenricityBfs(vertex_t startingPoint, int componentConsistency, int* eccentricity);
+	void eccenricityBfs(vertex_t startingPoint, int* eccentricity, int currentComponentIndex);
 
 	void colorVertex(vertex_t vertex, int* colors, bool* colorsUsed);
 
@@ -124,7 +125,7 @@ public:
 
 	void vertexColorsSLF();
 
-	int countOfC4();
+	long long int countOfC4();
 
 	[[nodiscard]] long long int complementEdges() const;
 

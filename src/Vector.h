@@ -121,6 +121,7 @@ namespace dst {
 
 
 		[[nodiscard]] size_t getSize() const { return size; }
+		[[nodiscard]] size_t getCapacity() const { return capacity; }
 
 
 		void clear() { size = 0; }

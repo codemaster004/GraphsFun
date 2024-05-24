@@ -73,11 +73,11 @@ int main() {
 		printf("%d\n", graph.numberOfComponents());
 		// printf("?\n");
 
-		printBool(graph.isBipartite());
 		// printf("?\n");
+		printBool(graph.isBipartite());
 
-		// printf("?\n"); // eccentricity
-		graph.vertexEccentricity();
+		printf("?\n"); // eccentricity
+		// graph.vertexEccentricity();
 
 		// graph.isPlanar();
 		printf("?\n");
@@ -94,11 +94,11 @@ int main() {
 		// graph.vertexColorsSLF();
 		// graph.printColours();
 
-		printf("%d\n", graph.countOfC4());
-		// printf("?\n"); // count C4
+		printf("?\n"); // count C4
+		// printf("%lld\n", graph.countOfC4());
 
-		printf("%lli\n", graph.complementEdges());
 		// printf("?\n");
+		printf("%lli\n", graph.complementEdges());
 
 		graph.clear();
 	}
