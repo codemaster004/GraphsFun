@@ -137,32 +137,27 @@ namespace dst {
 
 
 		// Iterator
-		class iterator {
-		private:
+		class Iterator {
 			T* ptr;
 
 		public:
-			explicit iterator(T* ptr) : ptr(ptr) {}
+			explicit Iterator(T* ptr) : ptr(ptr) {}
 
+			bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
 
-			bool operator!=(const iterator& other) const { return ptr != other.ptr; }
-
-
-			const iterator& operator++() {
+			const Iterator& operator++() {
 				++ptr;
 				return *this;
 			}
-
 
 			T& operator*() { return *ptr; }
 		};
 
 
 		// Begin and end for iterator
-		iterator begin() { return iterator(data); }
+		Iterator begin() { return Iterator(data); }
 
-
-		iterator end() { return iterator(data + size); }
+		Iterator end() { return Iterator(data + size); }
 	};
 } // namespace dst
 

@@ -76,8 +76,8 @@ int main() {
 		// printf("?\n");
 		printBool(graph.isBipartite());
 
-		printf("?\n"); // eccentricity
-		// graph.vertexEccentricity();
+		// printf("?\n"); // eccentricity
+		graph.vertexEccentricity();
 
 		// graph.isPlanar();
 		printf("?\n");

@@ -282,12 +282,12 @@ void Graph::vertexColorsGreedy() {
 	delete[] colorsUsed;
 }
 void Graph::vertexColorsLF() {
-	int nBuckets = t_maximumDegree - t_minimumDegree + 1;
+	int nBuckets = t_maximumDegree + 1;
 	auto* degreesBuckets = new dst::List<vertex_t>[nBuckets];
 
 	for (int i = 0; i < t_numberVertices; ++i) {
 		int degree = (int) t_adjancencyList[i].getSize();
-		degreesBuckets[degree - t_minimumDegree].push(i + 1);
+		degreesBuckets[degree].push(i + 1);
 	}
 
 	int verticesColored = 0;
@@ -337,22 +337,34 @@ long long int Graph::countOfC4() {
 
 	long long int c4Count = 0;
 
-	for (int i = 0; i < t_componnets.getSize(); ++i) {
-		int componentSize = (int) t_componentsVertices[i].getCapacity();
+	for (int componentIndex = 0; componentIndex < t_componnets.getSize(); ++componentIndex) {
+		int componentSize = (int) t_componentsVertices[componentIndex].getCapacity();
 		if (componentSize < 4) {
 			continue;
 		}
-		for (int v = 0; v < componentSize; ++v) {
-			int degreeV = getDegree(v + 1);
-			for (int u = v+1; u < componentSize; ++u) {
-				int degreeU = getDegree(u + 1);
+		for (int i = 0; i < componentSize; ++i) {
+			vertex_t v = t_componentsVertices[componentIndex][i];
+			int degreeV = getDegree(v);
+			// for (int i = 0; i < v; ++i) {
+			// 	printf("  ");
+			// }
+			if (degreeV < 2) {
+				continue;
+			}
+			for (int j = i+1; j < componentSize; ++j) {
+				vertex_t u = t_componentsVertices[componentIndex][j];
+				int degreeU = getDegree(u);
+				if (degreeU < 2) {
+					continue;
+				}
+
 				int indexU = 0;
 				int indexV = 0;
 
 				long long int neighbourCount = 0;
 				while (indexV < degreeV && indexU < degreeU) {
-					int neighbourOfV = t_adjancencyList[v][indexV].vertex;
-					int neighbourOfU = t_adjancencyList[u][indexU].vertex;
+					int neighbourOfV = t_adjancencyList[v-1][indexV].vertex;
+					int neighbourOfU = t_adjancencyList[u-1][indexU].vertex;
 					if (neighbourOfV == neighbourOfU) {
 						neighbourCount++;
 						indexV++;
@@ -364,8 +376,10 @@ long long int Graph::countOfC4() {
 					}
 				}
 
+				// printf("%lld ", neighbourCount);
 				c4Count += neighbourCount * (neighbourCount - 1) / 2;
 			}
+			// printf("\n");
 		}
 	}
 
@@ -400,36 +414,41 @@ long long int Graph::countOfC4() {
 
 
 	// c4Count = 0;
-	// int* countTable = new int[t_numberVertices];
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	countTable[i] = 0;
-	// }
+
+	// for (int i = 0; i < t_componnets.getSize(); ++i) {
+	// 	int verticesInComponent = (int) t_componentsVertices[i].getCapacity();
+	// 	auto* countTable = new int[verticesInComponent];
+	// 	for (int j = 0; j < verticesInComponent; ++j) {
+	// 		countTable[j] = 0;
+	// 	}
 	//
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	int degreeV = (int) t_adjancencyList[i].getSize();
+	// 	for (int v = 0; v < verticesInComponent; ++v) {
+	// 		int degreeV = (int) t_adjancencyList[v].getSize();
 	//
-	// 	for (auto neighbour: getNeighbours(i + 1)) {
-	// 		int degreeU = getDegree(neighbour.vertex);
-	// 		if (degreeU < degreeV || (degreeU == degreeV && neighbour.vertex < i + 1)) {
-	// 			for (auto secondNeighbour: getNeighbours(neighbour.vertex)) {
-	// 				int degreeW = getDegree(secondNeighbour.vertex);
-	// 				if (degreeW < degreeV || (degreeW == degreeV && secondNeighbour.vertex < i + 1)) {
-	// 					int countForVertex = get(countTable, secondNeighbour.vertex);
-	// 					c4Count += countForVertex;
-	// 					set(countTable, secondNeighbour.vertex, countForVertex + 1);
+	// 		for (auto u: getNeighbours(v + 1)) {
+	// 			int degreeU = getDegree(u.vertex);
+	// 			if (degreeU < degreeV || (degreeU == degreeV && u.vertex < v + 1)) {
+	// 				for (auto w: getNeighbours(u.vertex)) {
+	// 					int degreeW = getDegree(w.vertex);
+	// 					if (degreeW < degreeV || (degreeW == degreeV && w.vertex < v + 1)) {
+	// 						int countForVertex = get(countTable, w.vertex);
+	// 						c4Count += countForVertex;
+	// 						set(countTable, w.vertex, countForVertex + 1);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 		for (auto u: getNeighbours(v + 1)) {
+	// 			int degreeU = getDegree(u.vertex);
+	// 			if (degreeU < degreeV || (degreeU == degreeV && u.vertex < v + 1)) {
+	// 				for (auto w: getNeighbours(u.vertex)) {
+	// 					set(countTable, w.vertex, 0);
 	// 				}
 	// 			}
 	// 		}
 	// 	}
-	// 	for (auto neighbour: getNeighbours(i + 1)) {
-	// 		int degreeU = getDegree(neighbour.vertex);
-	// 		if (degreeU < degreeV || (degreeU == degreeV && neighbour.vertex < i + 1)) {
-	// 			for (auto secondNeighbour: getNeighbours(neighbour.vertex)) {
-	// 				set(countTable, secondNeighbour.vertex, 0);
-	// 			}
-	// 		}
-	// 	}
 	// }
+
 	return c4Count;
 }
 long long int Graph::complementEdges() const {

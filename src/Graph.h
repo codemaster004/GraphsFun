@@ -70,7 +70,7 @@ class Graph {
 
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(INT_MAX),
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(-1),
 		t_maximumDegree(0), t_degreeCounts(nullptr), t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr),
 		t_lowPoints2(nullptr) {}
 
@@ -94,7 +94,7 @@ public:
 		t_degreeCounts[degree] += 1;
 		if (degree > t_maximumDegree) {
 			t_maximumDegree = degree;
-		} else if (degree < t_minimumDegree) {
+		} else if (degree < t_minimumDegree || t_minimumDegree == -1) {
 			t_minimumDegree = degree;
 		}
 	}
@@ -165,6 +165,7 @@ public:
 
 		t_numberVertices = 0;
 		t_degreeSum = 0;
+		t_minimumDegree = -1;
 		t_maximumDegree = 0;
 	}
 
