@@ -90,9 +90,9 @@ int main() {
 		graph.vertexColorsLF();
 		graph.printColours();
 
-		printf("?\n"); // SLF
-		// graph.vertexColorsSLF();
-		// graph.printColours();
+		// printf("?\n"); // SLF
+		graph.vertexColorsSLF();
+		graph.printColours();
 
 		printf("?\n"); // count C4
 		// printf("%lld\n", graph.countOfC4());

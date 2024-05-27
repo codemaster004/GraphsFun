@@ -36,6 +36,16 @@ class Graph {
 		int* saturationValue_p;
 		int degree;
 		int vertex;
+
+		bool operator<(const SaturationInfo& other) const {
+			if (*this->saturationValue_p < *other.saturationValue_p) {
+				return true;
+			}
+			if (*this->saturationValue_p > *other.saturationValue_p) {
+				return false;
+			}
+			return this->degree < other.degree || (this->degree == other.degree && this->vertex > other.vertex);
+		}
 	};
 
 
@@ -66,7 +76,7 @@ class Graph {
 
 	void colorVertex(vertex_t vertex, int* colors, bool* colorsUsed);
 
-	static bool slfStructCompare(const SaturationInfo& a, const SaturationInfo& b);
+	static void updateIndexTable(const SaturationInfo& value, int newIndex, int* table);
 
 public:
 	Graph() :

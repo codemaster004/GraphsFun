@@ -254,7 +254,7 @@ void Graph::vertexEccentricity() {
 		if (componentSize == 1) {
 			set(verticesEccentricity, vertex, 0);
 			t_componentsVertices[currentComponentIndex].pushBack(vertex);
-		} else if(componentSize == 2) {
+		} else if (componentSize == 2) {
 			set(verticesEccentricity, vertex, 1);
 			set(verticesEccentricity, getNeighbours(vertex)[0].vertex, 1);
 			t_componentsVertices[currentComponentIndex].pushBack(vertex);
@@ -310,23 +310,38 @@ void Graph::vertexColorsLF() {
 	delete[] colorsUsed;
 }
 
-
-bool Graph::slfStructCompare(const SaturationInfo& a, const SaturationInfo& b) {
-	if (*a.saturationValue_p > *b.saturationValue_p) {
-		return true;
-	}
-	if (*a.saturationValue_p < *b.saturationValue_p) {
-		return false;
-	}
-	return a.degree > b.degree || (a.degree == b.degree && a.vertex < b.vertex);
+void Graph::updateIndexTable(const SaturationInfo& value, int newIndex, int* table) {
+	table[value.vertex - 1] = newIndex;
 }
 
 void Graph::vertexColorsSLF() {
 	auto* saturations = new int[t_numberVertices];
 	auto* queueIndexTable = new int[t_numberVertices];
 
-	for (VertexInfo componnet: t_componnets) {
-		dst::PriorityQueue<SaturationInfo>(componnet.info, slfStructCompare);
+	dst::PriorityQueue<SaturationInfo> queue(t_numberVertices);
+	for (int i = 0; i < t_numberVertices; ++i) {
+		saturations[i] = 0;
+		queue.insert(SaturationInfo{&saturations[i], (int) t_adjancencyList[i].getSize(), i + 1});
+	}
+
+	SaturationInfo* heapArray_p = queue._getRawTable();
+	for (int i = 1; i <= queue.getSize(); ++i) {
+		queueIndexTable[heapArray_p[i].vertex - 1] = i;
+	}
+	heapArray_p = nullptr;
+
+	queue.setIndexTableCallback(updateIndexTable, queueIndexTable);
+
+	while (!queue.isEmpty()) {
+		SaturationInfo current = queue.pop();
+		int color = 1;
+		set(t_colours, current.vertex, color);
+		for (Edge neighbour: getNeighbours(current.vertex)) {
+			if (get(t_colours, neighbour.vertex) == 0) {
+				set(saturations, neighbour.vertex, get(saturations, neighbour.vertex)+1);
+				queue.repairAtIndex(queueIndexTable[neighbour.vertex-1]);
+			}
+		}
 	}
 
 	delete[] queueIndexTable;
@@ -351,7 +366,7 @@ long long int Graph::countOfC4() {
 			if (degreeV < 2) {
 				continue;
 			}
-			for (int j = i+1; j < componentSize; ++j) {
+			for (int j = i + 1; j < componentSize; ++j) {
 				vertex_t u = t_componentsVertices[componentIndex][j];
 				int degreeU = getDegree(u);
 				if (degreeU < 2) {
@@ -363,8 +378,8 @@ long long int Graph::countOfC4() {
 
 				long long int neighbourCount = 0;
 				while (indexV < degreeV && indexU < degreeU) {
-					int neighbourOfV = t_adjancencyList[v-1][indexV].vertex;
-					int neighbourOfU = t_adjancencyList[u-1][indexU].vertex;
+					int neighbourOfV = t_adjancencyList[v - 1][indexV].vertex;
+					int neighbourOfU = t_adjancencyList[u - 1][indexU].vertex;
 					if (neighbourOfV == neighbourOfU) {
 						neighbourCount++;
 						indexV++;
