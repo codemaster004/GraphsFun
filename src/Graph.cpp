@@ -330,7 +330,11 @@ void Graph::vertexColorsSLF() {
 	dst::PriorityQueue<SaturationInfo> queue(t_numberVertices);
 	for (int i = 0; i < t_numberVertices; ++i) {
 		saturations[i] = 0;
-		queue.insert(SaturationInfo{saturations[i], (int) t_adjancencyList[i].getSize(), i + 1});
+		if (getDegree(i+1) == 0) {
+			set(t_colours, i+1, 1);
+			continue;
+		}
+		queue.insert(SaturationInfo{saturations[i], getDegree(i+1), i + 1});
 	}
 
 	SaturationInfo* heapData_p = queue._getRawTable();
@@ -344,6 +348,11 @@ void Graph::vertexColorsSLF() {
 		SaturationInfo current = queue.pop();
 
 		int color = 1;
+		for (; color <= t_maximumDegree; ++color) {
+			if (!verticesColorsSets[current.vertex-1].existsIn(color)) {
+				break;
+			}
+		}
 		set(t_colours, current.vertex, color);
 
 		for (auto [vertex, _]: getNeighbours(current.vertex)) {

@@ -61,6 +61,10 @@ namespace dst {
 					break;
 				}
 			}
+			if (int lIndex = leftIndex(index); lIndex <= t_size && t_heapData[index] < t_heapData[leftIndex(index)]) {
+				swap(lIndex, index);
+				udpateIndexes(index, lIndex);
+			}
 		}
 
 	public:

@@ -20,25 +20,19 @@ namespace dst {
 
 		Vector<List<KeyValue>> t_data;
 
-		int hash(int intValue) {
-			return intValue % t_cappacity;
-		}
+		int hash(int intValue) { return intValue % t_cappacity; }
 
 	public:
-		HashSet() : t_cappacity(1000), t_size(0) {
-			t_data.resize(t_cappacity);
-		}
+		HashSet() : t_cappacity(10), t_size(0) { t_data.resize(t_cappacity); }
 
-		explicit HashSet(int capacity) : t_cappacity(capacity), t_size(0) {
-			t_data.resize(t_cappacity);
-		}
+		explicit HashSet(int capacity) : t_cappacity(capacity), t_size(0) { t_data.resize(t_cappacity); }
 
 		void setValue(int key, T value) {
 			int hashedKey = hash(key);
 
 			bool alreadyExist = false;
 			for (KeyValue existingValue : t_data[hashedKey]) {
-				if (existingValue.value == value) {
+				if (existingValue.key == key) {
 					alreadyExist = true;
 					break;
 				}
@@ -60,9 +54,17 @@ namespace dst {
 			return T();
 		}
 
-		[[nodiscard]] int getSize() const {
-			return t_size;
+		bool existsIn(int key) {
+			int hashedKey = hash(key);
+			for (KeyValue element: t_data[hashedKey]) {
+				if (element.key == key) {
+					return true;
+				}
+			}
+			return false;
 		}
+
+		[[nodiscard]] int getSize() const { return t_size; }
 	};
 } // namespace dst
 
