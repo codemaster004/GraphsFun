@@ -16,37 +16,32 @@ using long_t = long long int;
 
 using vertex_t = int;
 
+struct SaturationInfo {
+	int saturationValue = 0;
+	int degree = 0;
+	vertex_t vertex = 0;
+
+	bool operator<(const SaturationInfo& other) const {
+		if (saturationValue < other.saturationValue) {
+			return true;
+		}
+		if (saturationValue > other.saturationValue) {
+			return false;
+		}
+		return degree < other.degree || (degree == other.degree && vertex > other.vertex);
+	}
+};
 
 class Graph {
 	struct Edge {
 		vertex_t vertex;
 		int info;
 
-		bool operator<(const Edge& other) const {
-			return vertex < other.vertex;
-		}
+		bool operator<(const Edge& other) const { return vertex < other.vertex; }
 
-		bool operator>(const Edge& other) const {
-			return vertex > other.vertex;
-		}
+		bool operator>(const Edge& other) const { return vertex > other.vertex; }
 	};
 	using VertexInfo = Edge;
-
-	struct SaturationInfo {
-		int* saturationValue_p;
-		int degree;
-		int vertex;
-
-		bool operator<(const SaturationInfo& other) const {
-			if (*this->saturationValue_p < *other.saturationValue_p) {
-				return true;
-			}
-			if (*this->saturationValue_p > *other.saturationValue_p) {
-				return false;
-			}
-			return this->degree < other.degree || (this->degree == other.degree && this->vertex > other.vertex);
-		}
-	};
 
 
 	dst::Vector<Edge>* t_adjancencyList;
@@ -80,8 +75,8 @@ class Graph {
 
 public:
 	Graph() :
-		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(-1),
-		t_maximumDegree(0), t_degreeCounts(nullptr), t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr),
+		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(-1), t_maximumDegree(0),
+		t_degreeCounts(nullptr), t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr),
 		t_lowPoints2(nullptr) {}
 
 	void initGrapthOrder(int order) {
@@ -109,13 +104,9 @@ public:
 		}
 	}
 	void updateDegreeSum(int degree) { t_degreeSum += degree; }
-	int getDegree(vertex_t vertex) {
-		return (int) t_adjancencyList[vertex - 1].getSize();
-	}
+	int getDegree(vertex_t vertex) { return (int) t_adjancencyList[vertex - 1].getSize(); }
 
-	Edge* getRawNeighboursArray(vertex_t forVertex) {
-		return t_adjancencyList[forVertex - 1].getRawPointer();
-	}
+	Edge* getRawNeighboursArray(vertex_t forVertex) { return t_adjancencyList[forVertex - 1].getRawPointer(); }
 
 	dst::Vector<Edge>& getNeighbours(vertex_t of) { return t_adjancencyList[of - 1]; }
 

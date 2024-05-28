@@ -9,6 +9,6 @@ add_executable(GraphsFun src/main.cpp
         src/Graph.cpp
         src/Graph.h
         src/List.h
-        src/Set.h
         src/Vector.h
-        src/PriorityQueue.h)
+        src/PriorityQueue.h
+        src/HashSet.h)

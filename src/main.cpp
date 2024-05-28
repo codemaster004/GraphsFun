@@ -33,7 +33,7 @@ void inputVertex(Graph& graph, vertex_t current) {
 		int neighbour = inputNumber('\n');
 		graph.addVertex(current, neighbour);
 	}
-	insertionSort(graph.getRawNeighboursArray(current), nNeighbours);
+	// insertionSort(graph.getRawNeighboursArray(current), nNeighbours);
 }
 
 void inputGrapth(Graph& graph) {
@@ -90,9 +90,9 @@ int main() {
 		graph.vertexColorsLF();
 		graph.printColours();
 
-		// printf("?\n"); // SLF
+		printf("?\n"); // SLF
 		graph.vertexColorsSLF();
-		graph.printColours();
+		// graph.printColours();
 
 		printf("?\n"); // count C4
 		// printf("%lld\n", graph.countOfC4());

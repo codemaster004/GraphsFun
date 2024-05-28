@@ -8,6 +8,7 @@
  */
 #include "Graph.h"
 
+#include "HashSet.h"
 #include "PriorityQueue.h"
 #include "Utilities.h"
 
@@ -314,38 +315,48 @@ void Graph::updateIndexTable(const SaturationInfo& value, int newIndex, int* tab
 	table[value.vertex - 1] = newIndex;
 }
 
+struct Test {
+	int value;
+	int val2;
+	int val3;
+};
+
 void Graph::vertexColorsSLF() {
 	auto* saturations = new int[t_numberVertices];
 	auto* queueIndexTable = new int[t_numberVertices];
 
+	dst::Vector<dst::HashSet<bool>> verticesColorsSets(t_numberVertices);
+
 	dst::PriorityQueue<SaturationInfo> queue(t_numberVertices);
 	for (int i = 0; i < t_numberVertices; ++i) {
 		saturations[i] = 0;
-		queue.insert(SaturationInfo{&saturations[i], (int) t_adjancencyList[i].getSize(), i + 1});
+		queue.insert(SaturationInfo{saturations[i], (int) t_adjancencyList[i].getSize(), i + 1});
 	}
 
-	SaturationInfo* heapArray_p = queue._getRawTable();
+	SaturationInfo* heapData_p = queue._getRawTable();
 	for (int i = 1; i <= queue.getSize(); ++i) {
-		queueIndexTable[heapArray_p[i].vertex - 1] = i;
+		queueIndexTable[heapData_p[i].vertex - 1] = i;
 	}
-	heapArray_p = nullptr;
 
 	queue.setIndexTableCallback(updateIndexTable, queueIndexTable);
 
 	while (!queue.isEmpty()) {
 		SaturationInfo current = queue.pop();
+
 		int color = 1;
 		set(t_colours, current.vertex, color);
-		for (Edge neighbour: getNeighbours(current.vertex)) {
-			if (get(t_colours, neighbour.vertex) == 0) {
-				set(saturations, neighbour.vertex, get(saturations, neighbour.vertex)+1);
-				queue.repairAtIndex(queueIndexTable[neighbour.vertex-1]);
+
+		for (auto [vertex, _]: getNeighbours(current.vertex)) {
+			if (get(t_colours, vertex) == 0) {
+				verticesColorsSets[vertex-1].setValue(color, true);
+				set(saturations, vertex, verticesColorsSets[vertex-1].getSize());
+				queue.updateAtIndex(queueIndexTable[vertex - 1], {get(saturations, vertex),getDegree(vertex), vertex});
 			}
 		}
 	}
 
-	delete[] queueIndexTable;
 	delete[] saturations;
+	delete[] queueIndexTable;
 }
 
 long long int Graph::countOfC4() {

@@ -13,10 +13,10 @@ namespace dst {
 	template<typename T>
 	class Vector {
 	private:
-		T* data; ///< Pointer to table of data
-
 		size_t size; ///< Number of element inside
 		size_t capacity; ///< Actually reserved capacity
+
+		T* data; ///< Pointer to table of data
 
 		void performResize() {
 			T* newValues = new T[capacity];
@@ -43,8 +43,10 @@ namespace dst {
 
 
 	public:
-		// Default Constructor
-		explicit Vector(size_t initialSize = 0) : size(0), capacity(initialSize), data(new T[initialSize]) {}
+
+		Vector() : size(0), capacity(0), data(nullptr) {}
+
+		explicit Vector(size_t initialSize) : size(0), capacity(initialSize), data(new T[initialSize]) {}
 
 
 		// Copy Constructor
