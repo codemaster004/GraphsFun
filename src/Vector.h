@@ -43,7 +43,6 @@ namespace dst {
 
 
 	public:
-
 		Vector() : size(0), capacity(0), data(nullptr) {}
 
 		explicit Vector(size_t initialSize) : size(0), capacity(initialSize), data(new T[initialSize]) {}
@@ -111,9 +110,9 @@ namespace dst {
 		}
 
 
-		T* getRawPointer() {
-			return data;
-		}
+		T* getRawPointer() { return data; }
+
+		void setSize(int newSize){this->size = newSize;};
 
 
 		[[nodiscard]] T& get(size_t index) { return data[index]; }

@@ -57,13 +57,9 @@ void printBool(bool flag) {
 
 int main() {
 
-	static int COUNT = 0;
-	int N_CASE = 1;
-
 	Graph graph;
 	int nGrapths = inputNumber('\n');
 	for (int i = 0; i < nGrapths; ++i) {
-		COUNT++;
 		inputGrapth(graph);
 
 		// printf("?\n");
@@ -94,8 +90,8 @@ int main() {
 		graph.vertexColorsSLF();
 		graph.printColours();
 
-		printf("?\n"); // count C4
-		// printf("%lld\n", graph.countOfC4());
+		// printf("?\n"); // count C4
+		printf("%lld\n", graph.countOfC4());
 
 		// printf("?\n");
 		printf("%lli\n", graph.complementEdges());

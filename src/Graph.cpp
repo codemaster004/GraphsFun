@@ -84,25 +84,46 @@ void Graph::lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, in
 
 bool Graph::isPlanar() {
 
-	printf("D:  ");
-	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", t_discoveryTime[i]);
-	}
-	printf("\n");
+	for (int componentIndex = 0; componentIndex < t_componnets.getSize(); componentIndex++) {
+		int nVertices = (int) t_componentsVertices[componentIndex].getCapacity();
+		int maxWeight = 2 * nVertices + 1;
 
-	printf("L1: ");
-	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", t_lowPoints1[i]);
-	}
-	printf("\n");
+		auto* buckets = new dst::List<Edge>[maxWeight];
+		for (vertex_t vertex: t_componentsVertices[componentIndex]) {
+			for (Edge neighbour: getNeighbours(vertex)) {
+				buckets[neighbour.info].push(neighbour);
+			}
+			int outputIndex = 0;
+			for (int i = 0; i < maxWeight; ++i) {
+				while (!buckets[i].isEmpty()) {
+					t_adjancencyList[vertex - 1][outputIndex] = buckets[i].pop();
+					outputIndex++;
+				}
+			}
+		}
 
-	printf("L2: ");
-	for (int i = 0; i < t_numberVertices; ++i) {
-		printf("%d ", t_lowPoints2[i]);
+		delete[] buckets;
 	}
-	printf("\n");
 
-	print();
+	// printf("D:  ");
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	printf("%d ", t_discoveryTime[i]);
+	// }
+	// printf("\n");
+	//
+	// printf("L1: ");
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	printf("%d ", t_lowPoints1[i]);
+	// }
+	// printf("\n");
+	//
+	// printf("L2: ");
+	// for (int i = 0; i < t_numberVertices; ++i) {
+	// 	printf("%d ", t_lowPoints2[i]);
+	// }
+	// printf("\n");
+	//
+	// print();
 
 	return false;
 }
@@ -122,6 +143,9 @@ void Graph::eccenricityBfs(vertex_t startingPoint, int* eccentricity, int curren
 
 	bool firstIteration = true;
 	int componentConsistencyNumber = (int) t_componentsVertices[currentComponentIndex].getCapacity();
+	t_componentsVertices[currentComponentIndex].setSize(
+		(int) t_componentsVertices[currentComponentIndex].getCapacity());
+
 	while (vertexIndex < componentConsistencyNumber) {
 		auto* distance = new int[t_numberVertices];
 		for (int i = 0; i < t_numberVertices; ++i) {
@@ -193,21 +217,24 @@ void Graph::colorVertex(vertex_t current, int* colors, bool* colorsUsed) {
 }
 
 int Graph::numberOfComponents() {
-	// t_discoveryTime = new int[t_numberVertices];
-	// t_lowPoints1 = new int[t_numberVertices];
-	// t_lowPoints2 = new int[t_numberVertices];
+	t_discoveryTime = new int[t_numberVertices];
+	t_lowPoints1 = new int[t_numberVertices];
+	t_lowPoints2 = new int[t_numberVertices];
 
 	auto* visited = new bool[t_numberVertices];
+
 	for (int i = 0; i < t_numberVertices; ++i) {
+		t_discoveryTime[i] = 0;
 		visited[i] = false;
 	}
 
 	for (int i = 0; i < t_numberVertices; ++i) {
-		if (!visited[i]) {
+		// if (!visited[i]) {
+		if (t_discoveryTime[i] == 0) {
 			int dfsCount = 0;
-			dfs(i + 1, visited, dfsCount);
+			// dfs(i + 1, visited, dfsCount);
+			lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 			t_componnets.push({i + 1, dfsCount});
-			// lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
 		}
 	}
 
@@ -315,12 +342,6 @@ void Graph::updateIndexTable(const SaturationInfo& value, int newIndex, int* tab
 	table[value.vertex - 1] = newIndex;
 }
 
-struct Test {
-	int value;
-	int val2;
-	int val3;
-};
-
 void Graph::vertexColorsSLF() {
 	auto* saturations = new int[t_numberVertices];
 	auto* queueIndexTable = new int[t_numberVertices];
@@ -330,11 +351,11 @@ void Graph::vertexColorsSLF() {
 	dst::PriorityQueue<SaturationInfo> queue(t_numberVertices);
 	for (int i = 0; i < t_numberVertices; ++i) {
 		saturations[i] = 0;
-		if (getDegree(i+1) == 0) {
-			set(t_colours, i+1, 1);
+		if (getDegree(i + 1) == 0) {
+			set(t_colours, i + 1, 1);
 			continue;
 		}
-		queue.insert(SaturationInfo{saturations[i], getDegree(i+1), i + 1});
+		queue.insert(SaturationInfo{saturations[i], getDegree(i + 1), i + 1});
 	}
 
 	SaturationInfo* heapData_p = queue._getRawTable();
@@ -349,7 +370,7 @@ void Graph::vertexColorsSLF() {
 
 		int color = 1;
 		for (; color <= t_maximumDegree; ++color) {
-			if (!verticesColorsSets[current.vertex-1].existsIn(color)) {
+			if (!verticesColorsSets[current.vertex - 1].existsIn(color)) {
 				break;
 			}
 		}
@@ -357,9 +378,9 @@ void Graph::vertexColorsSLF() {
 
 		for (auto [vertex, _]: getNeighbours(current.vertex)) {
 			if (get(t_colours, vertex) == 0) {
-				verticesColorsSets[vertex-1].setValue(color, true);
-				set(saturations, vertex, verticesColorsSets[vertex-1].getSize());
-				queue.updateAtIndex(queueIndexTable[vertex - 1], {get(saturations, vertex),getDegree(vertex), vertex});
+				verticesColorsSets[vertex - 1].setValue(color, true);
+				set(saturations, vertex, verticesColorsSets[vertex - 1].getSize());
+				queue.updateAtIndex(queueIndexTable[vertex - 1], {get(saturations, vertex), getDegree(vertex), vertex});
 			}
 		}
 	}
@@ -370,8 +391,12 @@ void Graph::vertexColorsSLF() {
 
 long long int Graph::countOfC4() {
 
-	long long int c4Count = 0;
+	long long c4Count = 0;
 
+	auto* neighbours = new bool[t_numberVertices];
+	for (int i = 0; i < t_numberVertices; ++i) {
+		neighbours[i] = false;
+	}
 	for (int componentIndex = 0; componentIndex < t_componnets.getSize(); ++componentIndex) {
 		int componentSize = (int) t_componentsVertices[componentIndex].getCapacity();
 		if (componentSize < 4) {
@@ -380,12 +405,13 @@ long long int Graph::countOfC4() {
 		for (int i = 0; i < componentSize; ++i) {
 			vertex_t v = t_componentsVertices[componentIndex][i];
 			int degreeV = getDegree(v);
-			// for (int i = 0; i < v; ++i) {
-			// 	printf("  ");
-			// }
 			if (degreeV < 2) {
 				continue;
 			}
+			for (auto [vertex, _]: getNeighbours(v)) {
+				neighbours[vertex - 1] = true;
+			}
+
 			for (int j = i + 1; j < componentSize; ++j) {
 				vertex_t u = t_componentsVertices[componentIndex][j];
 				int degreeU = getDegree(u);
@@ -393,30 +419,23 @@ long long int Graph::countOfC4() {
 					continue;
 				}
 
-				int indexU = 0;
-				int indexV = 0;
-
-				long long int neighbourCount = 0;
-				while (indexV < degreeV && indexU < degreeU) {
-					int neighbourOfV = t_adjancencyList[v - 1][indexV].vertex;
-					int neighbourOfU = t_adjancencyList[u - 1][indexU].vertex;
-					if (neighbourOfV == neighbourOfU) {
+				int neighbourCount = 0;
+				for (auto [vertex, _]: getNeighbours(u)) {
+					if (neighbours[vertex - 1]) {
 						neighbourCount++;
-						indexV++;
-						indexU++;
-					} else if (neighbourOfV < neighbourOfU) {
-						indexV++;
-					} else {
-						indexU++;
 					}
 				}
 
 				// printf("%lld ", neighbourCount);
 				c4Count += neighbourCount * (neighbourCount - 1) / 2;
 			}
-			// printf("\n");
+
+			for (auto [vertex, _]: getNeighbours(v)) {
+				neighbours[vertex - 1] = false;
+			}
 		}
 	}
+	delete[] neighbours;
 
 	c4Count /= 2;
 

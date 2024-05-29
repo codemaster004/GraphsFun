@@ -1,15 +1,16 @@
 /**
- * Created by Filip Dabkowski on 27/05/2024.
+ * Created by Filip Dabkowski on 29/05/2024.
  */
 
-#ifndef HASHSET_H
-#define HASHSET_H
+#ifndef HASHMAP_H
+#define HASHMAP_H
+
 #include "List.h"
 #include "Vector.h"
 
 namespace dst {
 	template<typename T>
-	class HashSet {
+	class HashMap {
 		int t_cappacity;
 		int t_size;
 
@@ -23,25 +24,14 @@ namespace dst {
 		int hash(int intValue) { return intValue % t_cappacity; }
 
 	public:
-		HashSet() : t_cappacity(10), t_size(0) { t_data.resize(t_cappacity); }
+		HashMap() : t_cappacity(50), t_size(0) { t_data.resize(t_cappacity); }
 
-		explicit HashSet(int capacity) : t_cappacity(capacity), t_size(0) { t_data.resize(t_cappacity); }
+		explicit HashMap(int capacity) : t_cappacity(capacity), t_size(0) { t_data.resize(t_cappacity); }
 
 		void setValue(int key, T value) {
 			int hashedKey = hash(key);
-
-			bool alreadyExist = false;
-			for (KeyValue existingValue : t_data[hashedKey]) {
-				if (existingValue.key == key) {
-					alreadyExist = true;
-					break;
-				}
-			}
-
-			if (!alreadyExist) {
-				t_data[hashedKey].insertBack({key, value});
-				t_size++;
-			}
+			t_data[hashedKey].insertBack({key, value});
+			t_size++;
 		}
 
 		T get(int key) {
@@ -68,4 +58,4 @@ namespace dst {
 	};
 } // namespace dst
 
-#endif // HASHSET_H
+#endif // HASHMAP_H
