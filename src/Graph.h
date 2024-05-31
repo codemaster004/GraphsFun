@@ -62,10 +62,21 @@ class Graph {
 	int* t_discoveryTime;
 	int* t_lowPoints1;
 	int* t_lowPoints2;
+	int* t_ancestor;
+	int* t_branchPoint;
 
-	void lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2);
+	dst::List<int> t_leftFace;
+	dst::List<int> t_rightFace;
+
+	bool t_notPlanar;
+
+	void lowPointDfs(vertex_t current, int& dfsCounter);
 	bool bipartiteDfs(vertex_t current, int previousColor);
 	void dfs(vertex_t current, bool* visited, int& dfsCount);
+	void branchPointDfs(vertex_t current);
+	void embedBranchDfs(vertex_t current);
+
+	bool embedFrond(vertex_t frondRoot, vertex_t frondEnd, int weight);
 
 	void eccenricityBfs(vertex_t startingPoint, int* eccentricity, int currentComponentIndex);
 
@@ -77,7 +88,7 @@ public:
 	Graph() :
 		t_adjancencyList(nullptr), t_numberVertices(0), t_degreeSum(0), t_minimumDegree(-1), t_maximumDegree(0),
 		t_degreeCounts(nullptr), t_colours(nullptr), t_discoveryTime(nullptr), t_lowPoints1(nullptr),
-		t_lowPoints2(nullptr) {}
+		t_lowPoints2(nullptr), t_ancestor(nullptr), t_notPlanar(false) {}
 
 	void initGrapthOrder(int order) {
 		t_numberVertices = order;
@@ -168,6 +179,21 @@ public:
 		t_degreeSum = 0;
 		t_minimumDegree = -1;
 		t_maximumDegree = 0;
+
+		delete[] t_discoveryTime;
+		t_discoveryTime = nullptr;
+
+		delete[] t_lowPoints1;
+		t_lowPoints1 = nullptr;
+
+		delete[] t_lowPoints2;
+		t_lowPoints2 = nullptr;
+
+		delete[] t_ancestor;
+		t_ancestor = nullptr;
+
+		delete[] t_branchPoint;
+		t_branchPoint = nullptr;
 	}
 
 	~Graph() { clear(); };

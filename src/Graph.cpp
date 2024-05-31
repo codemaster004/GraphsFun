@@ -54,38 +54,45 @@ void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int*
 // 	set(branchPoints, neighbour, current);
 // }
 
-void Graph::lowPointDfs(vertex_t current, int& dfsCounter, int* dfsDiscovery, int* lowPoints1, int* lowPoints2) {
+void Graph::lowPointDfs(vertex_t current, int& dfsCounter) {
 	dfsCounter++;
-	set(dfsDiscovery, current, dfsCounter);
-	set(lowPoints1, current, dfsCounter);
-	set(lowPoints2, current, dfsCounter);
+	set(t_discoveryTime, current, dfsCounter);
+	set(t_lowPoints1, current, dfsCounter);
+	set(t_lowPoints2, current, dfsCounter);
 
 	for (auto& [vertex, weight]: getNeighbours(current)) {
 
-		if (get(dfsDiscovery, vertex) != 0) {
-			updateLowpoints(current, vertex, lowPoints1, lowPoints2, dfsDiscovery, false);
+		if (get(t_discoveryTime, vertex) != 0) {
+			updateLowpoints(current, vertex, t_lowPoints1, t_lowPoints2, t_discoveryTime, false);
 		} else {
-			lowPointDfs(vertex, dfsCounter, dfsDiscovery, lowPoints1, lowPoints2);
-			updateLowpoints(current, vertex, lowPoints1, lowPoints2, dfsDiscovery, true);
+			set(t_ancestor, vertex, current);
+			lowPointDfs(vertex, dfsCounter);
+			updateLowpoints(current, vertex, t_lowPoints1, t_lowPoints2, t_discoveryTime, true);
 		}
 
 		// is a frond
-		if (get(dfsDiscovery, vertex) < get(dfsDiscovery, current)) {
-			weight = 2 * get(dfsDiscovery, vertex);
-		} else if (get(lowPoints2, vertex) == get(dfsDiscovery, current)) {
-			weight = 2 * get(lowPoints1, vertex);
-		} else if (get(lowPoints2, vertex) < get(dfsDiscovery, current)) {
-			weight = 2 * get(lowPoints1, vertex) + 1;
+		if (get(t_discoveryTime, vertex) < get(t_discoveryTime, current)) {
+			weight = 2 * get(t_discoveryTime, vertex);
+		} else if (get(t_lowPoints2, vertex) == get(t_discoveryTime, current)) {
+			weight = 2 * get(t_lowPoints1, vertex);
+		} else if (get(t_lowPoints2, vertex) < get(t_discoveryTime, current)) {
+			weight = 2 * get(t_lowPoints1, vertex) + 1;
 		} else {
-			weight = get(dfsDiscovery, vertex);
+			weight = get(t_discoveryTime, vertex);
 		}
 	}
 }
 
+
+
 bool Graph::isPlanar() {
 
 	for (int componentIndex = 0; componentIndex < t_componnets.getSize(); componentIndex++) {
+		vertex_t current = t_componnets[componentIndex].vertex;
 		int nVertices = (int) t_componentsVertices[componentIndex].getCapacity();
+		if (nVertices < 5) {
+			continue;
+		}
 		int maxWeight = 2 * nVertices + 1;
 
 		auto* buckets = new dst::List<Edge>[maxWeight];
@@ -103,6 +110,10 @@ bool Graph::isPlanar() {
 		}
 
 		delete[] buckets;
+
+		set(t_branchPoint, current, 0);
+		branchPointDfs(current);
+		embedBranchDfs(current);
 	}
 
 	// printf("D:  ");
@@ -125,6 +136,7 @@ bool Graph::isPlanar() {
 	//
 	// print();
 
+	printf("?\n");
 	return false;
 }
 
@@ -137,6 +149,54 @@ void Graph::dfs(vertex_t current, bool* visited, int& dfsCount) {
 		}
 	}
 }
+void Graph::branchPointDfs(vertex_t current) {
+	bool firstTime = true;
+	for (auto [vertex, _]: getNeighbours(current)) {
+		if (get(t_ancestor, vertex) == current) {
+			if (firstTime) {
+				set(t_branchPoint, vertex, get(t_branchPoint, current));
+			} else {
+				set(t_branchPoint, vertex, current);
+			}
+			branchPointDfs(vertex);
+		}
+		firstTime = false;
+	}
+}
+void Graph::embedBranchDfs(vertex_t current) {
+	for (auto [vertex, weight]: getNeighbours(current)) {
+		t_notPlanar = true;
+		if (get(t_ancestor, vertex) == current) {
+			if (get(t_branchPoint, vertex) == current) {
+				int lowPoint = get(t_lowPoints1, vertex);
+				if (t_leftFace.isEmpty() || t_leftFace.top() < lowPoint) {
+					t_leftFace.put(lowPoint);
+				}
+			}
+			embedBranchDfs(vertex);
+			if (t_notPlanar) {
+				return;
+			}
+		} else if (get(t_discoveryTime, vertex) < get(t_discoveryTime, current)) {
+			if (!embedFrond(current, vertex, weight)) {
+				return;
+			}
+		}
+	}
+	t_notPlanar = false;
+}
+bool Graph::embedFrond(vertex_t frondRoot, vertex_t frondEnd, int weight) {
+	if (t_leftFace.isEmpty() || t_leftFace.front() < weight) {
+		t_leftFace.put(weight);
+		return true;
+	}
+	if (t_rightFace.isEmpty() || t_rightFace.front() < weight) {
+		t_rightFace.put(weight);
+		return true;
+	}
+	return false;
+}
+
 void Graph::eccenricityBfs(vertex_t startingPoint, int* eccentricity, int currentComponentIndex) {
 	int vertexIndex = 0;
 	t_componentsVertices[currentComponentIndex][0] = startingPoint;
@@ -218,8 +278,10 @@ void Graph::colorVertex(vertex_t current, int* colors, bool* colorsUsed) {
 
 int Graph::numberOfComponents() {
 	t_discoveryTime = new int[t_numberVertices];
+	t_ancestor = new int[t_numberVertices];
 	t_lowPoints1 = new int[t_numberVertices];
 	t_lowPoints2 = new int[t_numberVertices];
+	t_branchPoint = new int[t_numberVertices];
 
 	auto* visited = new bool[t_numberVertices];
 
@@ -233,7 +295,8 @@ int Graph::numberOfComponents() {
 		if (t_discoveryTime[i] == 0) {
 			int dfsCount = 0;
 			// dfs(i + 1, visited, dfsCount);
-			lowPointDfs(i + 1, dfsCount, t_discoveryTime, t_lowPoints1, t_lowPoints2);
+			set(t_ancestor, i + 1, 0);
+			lowPointDfs(i + 1, dfsCount);
 			t_componnets.push({i + 1, dfsCount});
 		}
 	}
@@ -324,7 +387,6 @@ void Graph::vertexColorsLF() {
 	auto* colorsUsed = new bool[t_maximumDegree + 1];
 	while (verticesColored < t_numberVertices) {
 		for (vertex_t current: degreesBuckets[currentBucket]) {
-
 			if (get(t_colours, current) == 0) {
 				colorVertex(current, t_colours, colorsUsed);
 			}
