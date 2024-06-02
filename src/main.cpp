@@ -75,8 +75,8 @@ int main() {
 		// printf("?\n"); // eccentricity
 		graph.vertexEccentricity();
 
-		// printf("?\n");
-		graph.isPlanar();
+		printf("?\n");
+		// graph.isPlanar();
 
 		// printf("?\n"); // Greedy
 		graph.vertexColorsGreedy();

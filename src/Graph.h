@@ -43,6 +43,11 @@ class Graph {
 	};
 	using VertexInfo = Edge;
 
+	struct ComponentInfo {
+		vertex_t startingPoint;
+		int order;
+	};
+
 
 	dst::Vector<Edge>* t_adjancencyList;
 	int t_numberVertices;
@@ -53,7 +58,7 @@ class Graph {
 
 	long_t t_degreeSum;
 
-	dst::List<VertexInfo> t_componnets;
+	dst::List<ComponentInfo> t_componnets;
 	dst::Vector<vertex_t>* t_componentsVertices;
 
 	int* t_colours;

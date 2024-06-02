@@ -56,6 +56,7 @@ void updateLowpoints(vertex_t currect, vertex_t neighbour, int* lowPoints1, int*
 
 void Graph::lowPointDfs(vertex_t current, int& dfsCounter) {
 	dfsCounter++;
+	// degreeSum += (int) t_adjancencyList[current - 1].getSize();
 	set(t_discoveryTime, current, dfsCounter);
 	set(t_lowPoints1, current, dfsCounter);
 	set(t_lowPoints2, current, dfsCounter);
@@ -84,15 +85,22 @@ void Graph::lowPointDfs(vertex_t current, int& dfsCounter) {
 }
 
 
-
 bool Graph::isPlanar() {
 
+	bool isPlanar = true;
+	bool isNotPlanar = false;
 	for (int componentIndex = 0; componentIndex < t_componnets.getSize(); componentIndex++) {
-		vertex_t current = t_componnets[componentIndex].vertex;
+		vertex_t current = t_componnets[componentIndex].startingPoint;
 		int nVertices = (int) t_componentsVertices[componentIndex].getCapacity();
 		if (nVertices < 5) {
 			continue;
 		}
+		// if (t_componnets[componentIndex].size > 3 * t_componnets[componentIndex].order - 6) {
+		// 	isNotPlanar = true;
+		// 	break;
+		// }
+		isPlanar = false; // todo: remove, this is temporary
+
 		int maxWeight = 2 * nVertices + 1;
 
 		auto* buckets = new dst::List<Edge>[maxWeight];
@@ -116,27 +124,13 @@ bool Graph::isPlanar() {
 		embedBranchDfs(current);
 	}
 
-	// printf("D:  ");
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	printf("%d ", t_discoveryTime[i]);
-	// }
-	// printf("\n");
-	//
-	// printf("L1: ");
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	printf("%d ", t_lowPoints1[i]);
-	// }
-	// printf("\n");
-	//
-	// printf("L2: ");
-	// for (int i = 0; i < t_numberVertices; ++i) {
-	// 	printf("%d ", t_lowPoints2[i]);
-	// }
-	// printf("\n");
-	//
-	// print();
-
-	printf("?\n");
+	if (isNotPlanar) {
+		printf("F\n");
+	} else if (isPlanar) {
+		printf("T\n");
+	} else {
+		printf("?\n");
+	}
 	return false;
 }
 
@@ -170,7 +164,7 @@ void Graph::embedBranchDfs(vertex_t current) {
 			if (get(t_branchPoint, vertex) == current) {
 				int lowPoint = get(t_lowPoints1, vertex);
 				if (t_leftFace.isEmpty() || t_leftFace.top() < lowPoint) {
-					t_leftFace.put(lowPoint);
+					// t_leftFace.put(lowPoint);
 				}
 			}
 			embedBranchDfs(vertex);
@@ -187,11 +181,11 @@ void Graph::embedBranchDfs(vertex_t current) {
 }
 bool Graph::embedFrond(vertex_t frondRoot, vertex_t frondEnd, int weight) {
 	if (t_leftFace.isEmpty() || t_leftFace.front() < weight) {
-		t_leftFace.put(weight);
+		// t_leftFace.put(weight);
 		return true;
 	}
 	if (t_rightFace.isEmpty() || t_rightFace.front() < weight) {
-		t_rightFace.put(weight);
+		// t_rightFace.put(weight);
 		return true;
 	}
 	return false;
@@ -294,6 +288,7 @@ int Graph::numberOfComponents() {
 		// if (!visited[i]) {
 		if (t_discoveryTime[i] == 0) {
 			int dfsCount = 0;
+			int degreeSum = 0;
 			// dfs(i + 1, visited, dfsCount);
 			set(t_ancestor, i + 1, 0);
 			lowPointDfs(i + 1, dfsCount);
@@ -328,7 +323,7 @@ bool Graph::isBipartite() {
 
 	bool bipartite = true;
 	for (auto componnet: t_componnets) {
-		bipartite = bipartiteDfs(componnet.vertex, 2);
+		bipartite = bipartiteDfs(componnet.startingPoint, 2);
 		if (!bipartite) {
 			break;
 		}
