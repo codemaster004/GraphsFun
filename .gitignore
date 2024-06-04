@@ -4,5 +4,8 @@
 # CAMKE
 cmake-build-debug/
 
+# Python venv
+venv/
+
 # General library folder
 lib/
